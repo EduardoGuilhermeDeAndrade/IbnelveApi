@@ -17,10 +17,10 @@ public static class DataSeeder
         await context.Database.MigrateAsync();
 
         // Seed de usuário admin
-        await SeedAdminUserAsync(userManager);
+        //await SeedAdminUserAsync(userManager);
 
         // Seed de produtos
-        await SeedProdutosAsync(context);
+        //await SeedProdutosAsync(context);
     }
 
     private static async Task SeedAdminUserAsync(UserManager<IdentityUser> userManager)
