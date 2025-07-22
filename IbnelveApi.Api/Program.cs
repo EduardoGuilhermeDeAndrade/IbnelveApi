@@ -88,7 +88,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     // Cabeçalho do tenant no Swagger
-    //c.OperationFilter<TenantHeaderOperationFilter>();
+    c.OperationFilter<TenantHeaderOperationFilter>();
 });
 
 var app = builder.Build();
@@ -129,4 +129,24 @@ app.MapProdutoEndpoints();
 
 app.Run();
 
-// ✅ Swagger Operation
+// ✅ Swagger Operation Filter para X-Tenant-Id
+public class TenantHeaderOperationFilter : Swashbuckle.AspNetCore.SwaggerGen.IOperationFilter
+{
+    public void Apply(OpenApiOperation operation, Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext context)
+    {
+        operation.Parameters ??= new List<OpenApiParameter>();
+
+        operation.Parameters.Add(new OpenApiParameter
+        {
+            Name = "X-Tenant-Id",
+            In = ParameterLocation.Header,
+            Required = false,
+            Description = "ID do tenant para Multi-Tenancy",
+            Schema = new OpenApiSchema
+            {
+                Type = "string",
+                Default = new Microsoft.OpenApi.Any.OpenApiString("tenant1")
+            }
+        });
+    }
+}

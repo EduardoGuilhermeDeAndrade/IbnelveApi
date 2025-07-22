@@ -12,7 +12,6 @@ using IbnelveApi.Infrastructure.Services;
 using IbnelveApi.Infrastructure.Identity;
 using IbnelveApi.Application.Services;
 using IbnelveApi.Application.Validators;
-using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Mappings;
 using IbnelveApi.Domain.Interfaces;
 
@@ -40,7 +39,8 @@ public static class DependencyInjection
 
         // JWT Authentication
         var jwtSettings = configuration.GetSection("JwtSettings");
-        var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured"));
+        var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ??
+            throw new InvalidOperationException("JWT SecretKey not configured"));
 
         services.AddAuthentication(options =>
         {
@@ -63,6 +63,9 @@ public static class DependencyInjection
                 ClockSkew = TimeSpan.Zero
             };
         });
+
+        // Authorization - OBRIGATÓRIO para UseAuthorization() funcionar
+        services.AddAuthorization();
 
         return services;
     }
