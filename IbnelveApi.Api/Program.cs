@@ -3,16 +3,14 @@ using IbnelveApi.Api.Middleware;
 using IbnelveApi.Api.Endpoints;
 using IbnelveApi.Infrastructure.Data;
 using Microsoft.OpenApi.Models;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔧 IoC - Injeta todos os serviços do projeto
+// Add services to the container - CONFIGURAÇÃO CENTRALIZADA NO DependencyInjection.cs
+// ESTA LINHA JÁ REGISTRA: Identity, Authentication, Authorization, Repositories, Services, etc.
 builder.Services.AddAllServices(builder.Configuration);
 
-// ✅ CORS
+// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -23,35 +21,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ✅ Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-// ✅ JWT sem sobrescrever o esquema padrão do Identity
-builder.Services.AddAuthentication(options =>
-{
-    // NÃO defina o DefaultScheme como "Bearer", pois o Identity já define como "Identity.Application"
-    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-})
-.AddJwtBearer("Bearer", options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = "seu-issuer",
-        ValidAudience = "sua-audiencia",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("sua-chave-secreta"))
-    };
-});
-
-builder.Services.AddAuthorization();
-
-// ✅ Swagger
+// Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -62,7 +32,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API com Clean Architecture, Multi-Tenancy e JWT Authentication"
     });
 
-    // JWT no Swagger
+    // Configure JWT authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando o esquema Bearer. Exemplo: \"Authorization: Bearer {token}\"",
@@ -87,62 +57,76 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Cabeçalho do tenant no Swagger
+    // Add X-Tenant-Id header parameter for all operations
     c.OperationFilter<TenantHeaderOperationFilter>();
 });
 
 var app = builder.Build();
 
-// 🌐 Pipeline de requisição HTTP
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "IbnelveApi v1");
-        c.RoutePrefix = string.Empty;
+        c.RoutePrefix = string.Empty; // Swagger na raiz
     });
 }
 
 app.UseHttpsRedirection();
+
 app.UseCors("AllowAll");
 
-app.UseTenantMiddleware(); // Multi-Tenant
+// Use tenant middleware before authentication
+app.UseTenantMiddleware();
 
-app.UseAuthentication(); // 🔐
+// Authentication and Authorization middleware
+// ESTES MIDDLEWARES FUNCIONAM PORQUE OS SERVIÇOS JÁ FORAM REGISTRADOS NO DependencyInjection.cs
+app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔧 Endpoints auxiliares
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
-   .WithName("HealthCheck")
-   .WithTags("Health");
+// Map endpoints
+app.MapAuthEndpoints();
+app.MapProdutoEndpoints();
 
-// 🔧 Seeding
+
+
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new
+{
+    Status = "Healthy",
+    Timestamp = DateTime.UtcNow,
+    Environment = app.Environment.EnvironmentName
+}))
+.WithName("HealthCheck")
+.WithTags("Health");
+
+
+
+
+// Seed data on startup
 using (var scope = app.Services.CreateScope())
 {
     await DataSeeder.SeedAsync(scope.ServiceProvider);
 }
 
-// 🔧 Endpoints customizados
-app.MapAuthEndpoints();
-app.MapProdutoEndpoints();
-
 app.Run();
 
-// ✅ Swagger Operation Filter para X-Tenant-Id
+// Operation filter for Swagger to add X-Tenant-Id header to all operations
 public class TenantHeaderOperationFilter : Swashbuckle.AspNetCore.SwaggerGen.IOperationFilter
 {
-    public void Apply(OpenApiOperation operation, Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext context)
+    public void Apply(Microsoft.OpenApi.Models.OpenApiOperation operation, Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext context)
     {
-        operation.Parameters ??= new List<OpenApiParameter>();
+        operation.Parameters ??= new List<Microsoft.OpenApi.Models.OpenApiParameter>();
 
-        operation.Parameters.Add(new OpenApiParameter
+        operation.Parameters.Add(new Microsoft.OpenApi.Models.OpenApiParameter
         {
             Name = "X-Tenant-Id",
-            In = ParameterLocation.Header,
+            In = Microsoft.OpenApi.Models.ParameterLocation.Header,
             Required = false,
-            Description = "ID do tenant para Multi-Tenancy",
-            Schema = new OpenApiSchema
+            Description = "ID do tenant para Multi-Tenancy (ex: tenant1, tenant2)",
+            Schema = new Microsoft.OpenApi.Models.OpenApiSchema
             {
                 Type = "string",
                 Default = new Microsoft.OpenApi.Any.OpenApiString("tenant1")
@@ -150,3 +134,4 @@ public class TenantHeaderOperationFilter : Swashbuckle.AspNetCore.SwaggerGen.IOp
         });
     }
 }
+
