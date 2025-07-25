@@ -72,9 +72,9 @@ public static class DependencyInjection
 
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // AutoMapper
-        //services.AddAutoMapper(typeof(ProdutoMappingProfile));
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        // AutoMapper - CONFIGURAÇÃO CORRIGIDA
+        // Usa apenas o assembly específico com o ProdutoMappingProfile
+        services.AddAutoMapper(typeof(ProdutoMappingProfile));
 
         // FluentValidation
         services.AddValidatorsFromAssemblyContaining<ProdutoCreateDtoValidator>();
