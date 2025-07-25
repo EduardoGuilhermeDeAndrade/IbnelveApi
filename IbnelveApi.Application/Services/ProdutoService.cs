@@ -1,7 +1,8 @@
-using AutoMapper;
 using FluentValidation;
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.Mappers.Interfaces;
+using IbnelveApi.Application.Mappers.Extensions;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Interfaces;
 
@@ -10,20 +11,20 @@ namespace IbnelveApi.Application.Services;
 public class ProdutoService : IProdutoService
 {
     private readonly IProdutoRepository _produtoRepository;
-    private readonly IMapper _mapper;
+    private readonly IProdutoMapper _produtoMapper;
     private readonly IValidator<ProdutoCreateDto> _createValidator;
     private readonly IValidator<ProdutoUpdateDto> _updateValidator;
     private readonly ITenantContext _tenantContext;
 
     public ProdutoService(
         IProdutoRepository produtoRepository,
-        IMapper mapper,
+        IProdutoMapper produtoMapper,
         IValidator<ProdutoCreateDto> createValidator,
         IValidator<ProdutoUpdateDto> updateValidator,
         ITenantContext tenantContext)
     {
         _produtoRepository = produtoRepository;
-        _mapper = mapper;
+        _produtoMapper = produtoMapper;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
         _tenantContext = tenantContext;
@@ -34,7 +35,10 @@ public class ProdutoService : IProdutoService
         try
         {
             var produtos = await _produtoRepository.GetAllAsync();
-            var produtosDto = _mapper.Map<IEnumerable<ProdutoResponseDto>>(produtos);
+
+            // Usando método de extensão para mapeamento
+            var produtosDto = produtos.ValidForMapping().ToResponseDtos();
+
             return ApiResponse<IEnumerable<ProdutoResponseDto>>.SuccessResult(produtosDto);
         }
         catch (Exception ex)
@@ -55,7 +59,8 @@ public class ProdutoService : IProdutoService
                     "Produto não encontrado", "O produto especificado não existe");
             }
 
-            var produtoDto = _mapper.Map<ProdutoResponseDto>(produto);
+            // Usando mapper injetado
+            var produtoDto = _produtoMapper.MapToResponse(produto);
             return ApiResponse<ProdutoResponseDto>.SuccessResult(produtoDto);
         }
         catch (Exception ex)
@@ -77,11 +82,13 @@ public class ProdutoService : IProdutoService
                     "Dados inválidos", errors);
             }
 
-            var produto = _mapper.Map<Produto>(produtoDto);
-            produto.TenantId = _tenantContext.TenantId;
+            // Usando mapper com TenantId
+            var produto = _produtoMapper.MapToEntity(produtoDto, _tenantContext.TenantId);
 
             var produtoCriado = await _produtoRepository.AddAsync(produto);
-            var produtoResponseDto = _mapper.Map<ProdutoResponseDto>(produtoCriado);
+
+            // Usando método de extensão para resposta
+            var produtoResponseDto = produtoCriado.ToResponseDto();
 
             return ApiResponse<ProdutoResponseDto>.SuccessResult(
                 produtoResponseDto, "Produto criado com sucesso");
@@ -112,12 +119,13 @@ public class ProdutoService : IProdutoService
                     "Produto não encontrado", "O produto especificado não existe");
             }
 
-            produtoExistente.Nome = produtoDto.Nome;
-            produtoExistente.Preco = produtoDto.Preco;
-            produtoExistente.UpdatedAt = DateTime.UtcNow;
+            // Usando método de extensão para atualização
+            produtoExistente.UpdateFrom(produtoDto);
 
             var produtoAtualizado = await _produtoRepository.UpdateAsync(produtoExistente);
-            var produtoResponseDto = _mapper.Map<ProdutoResponseDto>(produtoAtualizado);
+
+            // Usando mapper para resposta
+            var produtoResponseDto = _produtoMapper.MapToResponse(produtoAtualizado);
 
             return ApiResponse<ProdutoResponseDto>.SuccessResult(
                 produtoResponseDto, "Produto atualizado com sucesso");
