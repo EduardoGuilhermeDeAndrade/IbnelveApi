@@ -67,7 +67,10 @@ public static class DependencyInjection
     {
         // Application Services
         services.AddScoped<IPessoaService, PessoaService>();
+<<<<<<< HEAD
         services.AddScoped<ITarefaService, TarefaService>();
+=======
+>>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
         
         // JWT Service
         services.AddScoped<IJwtTokenService, JwtTokenService>();
@@ -82,7 +85,10 @@ public static class DependencyInjection
     {
         // Repositories
         services.AddScoped<IPessoaRepository, PessoaRepository>();
+<<<<<<< HEAD
         services.AddScoped<ITarefaRepository, TarefaRepository>();
+=======
+>>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         return services;

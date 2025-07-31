@@ -14,7 +14,10 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     }
 
     public DbSet<Pessoa> Pessoas { get; set; }
+<<<<<<< HEAD
     public DbSet<Tarefa> Tarefas { get; set; }
+=======
+>>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,7 +25,10 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         // Aplicar configurações
         modelBuilder.ApplyConfiguration(new PessoaConfiguration());
+<<<<<<< HEAD
         modelBuilder.ApplyConfiguration(new TarefaConfiguration());
+=======
+>>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
 
         // Configurar filtros globais para soft delete e multi-tenancy
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())

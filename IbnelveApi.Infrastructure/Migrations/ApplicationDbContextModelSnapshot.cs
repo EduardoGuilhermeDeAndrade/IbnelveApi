@@ -74,6 +74,7 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.ToTable("Pessoas", (string)null);
                 });
 
+<<<<<<< HEAD
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Tarefa", b =>
                 {
                     b.Property<int>("Id")
@@ -147,6 +148,8 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.ToTable("Tarefas", (string)null);
                 });
 
+=======
+>>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
