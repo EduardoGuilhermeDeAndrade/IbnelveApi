@@ -2,10 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.ValueObjects;
-<<<<<<< HEAD
 using IbnelveApi.Domain.Enums;
-=======
->>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
 
 namespace IbnelveApi.Infrastructure.Data;
 
@@ -18,12 +15,10 @@ public static class DataSeeder
 
         // Seed de pessoas
         await SeedPessoasAsync(context);
-<<<<<<< HEAD
 
         // Seed de tarefas
         await SeedTarefasAsync(context);
-=======
->>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
+
     }
 
     private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager)
@@ -104,7 +99,6 @@ public static class DataSeeder
             await context.SaveChangesAsync();
         }
     }
-<<<<<<< HEAD
 
     private static async Task SeedTarefasAsync(ApplicationDbContext context)
     {
@@ -193,9 +187,5 @@ public static class DataSeeder
             await context.SaveChangesAsync();
         }
     }
-
-
-=======
->>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef
 }
 
