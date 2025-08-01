@@ -18,7 +18,6 @@ public static class DataSeeder
 
         // Seed de tarefas
         await SeedTarefasAsync(context);
-
     }
 
     private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager)
@@ -187,5 +186,7 @@ public static class DataSeeder
             await context.SaveChangesAsync();
         }
     }
+
+
 }
 

@@ -80,7 +80,6 @@ Exclui pessoa logicamente
 4. Use o token retornado nos endpoints de Pessoa
 5. Teste os CRUDs e filtros
 
-<<<<<<< HEAD
 
 
 ## 📋 Tarefas (Requer Authorization: Bearer {token})
@@ -172,5 +171,3 @@ Exclui tarefa logicamente
 - Otimizar consultas do banco (Pendente, Média)
 - Backup do banco de dados (Pendente, Baixa)
 
-=======
->>>>>>> 09018c6cf36ff7be2c7692753f7f26e4def5e9ef

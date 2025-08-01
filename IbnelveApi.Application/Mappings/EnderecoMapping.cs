@@ -21,7 +21,7 @@ public static class EnderecoMapping
     {
         return new Endereco(
             enderecoDto.Rua,
-            enderecoDto.CEP?.Replace(".", "").Replace("-", "").Replace(" ", ""),
+            enderecoDto.CEP,
             enderecoDto.Bairro,
             enderecoDto.Cidade,
             enderecoDto.UF
