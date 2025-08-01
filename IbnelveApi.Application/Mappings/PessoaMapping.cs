@@ -22,10 +22,10 @@ public static class PessoaMapping
     }
 
     public static Pessoa ToEntity(CreatePessoaDto createDto, string tenantId)
-    {
+    {  
         return new Pessoa(
             createDto.Nome,
-            createDto.CPF,
+            createDto.CPF?.Replace(".", "").Replace("-", "").Replace(" ", ""),
             createDto.Telefone,
             EnderecoMapping.ToValueObject(createDto.Endereco),
             tenantId
