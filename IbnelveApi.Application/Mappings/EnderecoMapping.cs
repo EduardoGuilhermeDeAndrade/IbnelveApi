@@ -10,7 +10,7 @@ public static class EnderecoMapping
         return new EnderecoDto
         {
             Rua = endereco.Rua,
-            CEP = endereco.CEP,
+            CEP = endereco.CEP.Replace(".", "").Replace("-", "").Replace(" ", ""),
             Bairro = endereco.Bairro,
             Cidade = endereco.Cidade,
             UF = endereco.UF
@@ -21,7 +21,7 @@ public static class EnderecoMapping
     {
         return new Endereco(
             enderecoDto.Rua,
-            enderecoDto.CEP,
+            enderecoDto.CEP.Replace(".", "").Replace("-", "").Replace(" ", ""),
             enderecoDto.Bairro,
             enderecoDto.Cidade,
             enderecoDto.UF
