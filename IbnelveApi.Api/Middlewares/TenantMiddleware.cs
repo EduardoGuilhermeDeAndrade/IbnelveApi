@@ -1,5 +1,4 @@
-﻿// IbnelveApi.Api/Middlewares/TenantMiddleware.cs
-using IbnelveApi.Application.Interfaces;
+﻿using IbnelveApi.Application.Interfaces;
 using System.Security.Claims;
 
 namespace IbnelveApi.Api.Middlewares;

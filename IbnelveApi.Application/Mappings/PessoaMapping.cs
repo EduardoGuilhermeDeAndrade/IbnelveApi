@@ -15,7 +15,6 @@ public static class PessoaMapping
             CPF = pessoa.CPF,
             Telefone = pessoa.Telefone,
             Endereco = EnderecoMapping.ToDto(pessoa.Endereco),
-            //TenantId = pessoa.TenantId,
             CreatedAt = pessoa.CreatedAt,
             UpdatedAt = pessoa.UpdatedAt
         };
@@ -28,19 +27,9 @@ public static class PessoaMapping
             createDto.CPF.Replace(".", "").Replace("-", "").Replace(" ", ""),
             createDto.Telefone,
             EnderecoMapping.ToValueObject(createDto.Endereco)
-            // TenantId será definido automaticamente no DbContext.SaveChangesAsync
+
         );
     }
-    //public static Pessoa ToEntity(CreatePessoaDto createDto, string tenantId)
-    //{
-    //    return new Pessoa(
-    //        createDto.Nome,
-    //        createDto.CPF.Replace(".", "").Replace("-", "").Replace(" ", ""),
-    //        createDto.Telefone,
-    //        EnderecoMapping.ToValueObject(createDto.Endereco),
-    //        tenantId
-    //    );
-    //}
 
     public static void UpdateEntity(Pessoa pessoa, UpdatePessoaDto updateDto)
     {

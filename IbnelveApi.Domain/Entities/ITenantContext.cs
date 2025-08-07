@@ -1,5 +1,4 @@
-﻿// IbnelveApi.Application/Interfaces/ITenantContext.cs
-namespace IbnelveApi.Application.Interfaces;
+﻿namespace IbnelveApi.Application.Interfaces;
 
 public interface ITenantContext
 {

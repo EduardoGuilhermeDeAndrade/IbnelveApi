@@ -1,4 +1,4 @@
-﻿// IbnelveApi.Api/Extensions/MiddlewareExtensions.cs
+﻿
 using IbnelveApi.Api.Middlewares;
 
 namespace IbnelveApi.Api.Extensions;
