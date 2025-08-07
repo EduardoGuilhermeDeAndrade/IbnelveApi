@@ -7,7 +7,7 @@ public class PessoaDto
     public string CPF { get; set; } = string.Empty;
     public string Telefone { get; set; } = string.Empty;
     public EnderecoDto Endereco { get; set; } = new();
-    public string TenantId { get; set; } = string.Empty;
+    //public string TenantId { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

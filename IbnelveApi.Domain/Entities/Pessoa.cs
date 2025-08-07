@@ -11,6 +11,14 @@ public class Pessoa : BaseEntity
 
     public Pessoa() { }
 
+    public Pessoa(string nome, string cpf, string telefone, Endereco endereco)
+    {
+        Nome = nome;
+        CPF = cpf;
+        Telefone = telefone;
+        Endereco = endereco;
+    }
+
     public Pessoa(string nome, string cpf, string telefone, Endereco endereco, string tenantId)
     {
         Nome = nome;

@@ -20,7 +20,7 @@ public class TarefaService : ITarefaService
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id, tenantId);
+            var tarefa = await _tarefaRepository.GetByIdAsync(id);
             
             if (tarefa == null)
                 return ApiResponse<TarefaDto>.ErrorResult("Tarefa não encontrada");
@@ -38,7 +38,7 @@ public class TarefaService : ITarefaService
     {
         try
         {
-            var tarefas = await _tarefaRepository.GetAllAsync(tenantId, includeDeleted);
+            var tarefas = await _tarefaRepository.GetAllAsync();
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
             
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
@@ -116,7 +116,7 @@ public class TarefaService : ITarefaService
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id, tenantId);
+            var tarefa = await _tarefaRepository.GetByIdAsync(id);
             
             if (tarefa == null)
                 return ApiResponse<TarefaDto>.ErrorResult("Tarefa não encontrada");
@@ -137,7 +137,7 @@ public class TarefaService : ITarefaService
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id, tenantId);
+            var tarefa = await _tarefaRepository.GetByIdAsync(id);
             
             if (tarefa == null)
                 return ApiResponse<TarefaDto>.ErrorResult("Tarefa não encontrada");
@@ -168,12 +168,12 @@ public class TarefaService : ITarefaService
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id, tenantId);
+            var tarefa = await _tarefaRepository.GetByIdAsync(id);
             
             if (tarefa == null)
                 return ApiResponse<bool>.ErrorResult("Tarefa não encontrada");
 
-            await _tarefaRepository.DeleteAsync(id, tenantId);
+            await _tarefaRepository.DeleteAsync(id);
             return ApiResponse<bool>.SuccessResult(true, "Tarefa excluída com sucesso");
         }
         catch (Exception ex)

@@ -3,10 +3,17 @@ using Microsoft.OpenApi.Models;
 using IbnelveApi.Infrastructure.Data;
 using IbnelveApi.IoC;
 
+using IbnelveApi.Api.Extensions;
+using IbnelveApi.Application.Interfaces;
+using IbnelveApi.Infrastructure.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
+
+// Registrar TenantContext como Scoped
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 // Add all dependencies (Infrastructure, Application, Repositories)
 builder.Services.AddAllDependencies(builder.Configuration);
@@ -88,6 +95,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
+app.UseTenantMiddleware();
 app.UseAuthorization();
 
 app.MapControllers();

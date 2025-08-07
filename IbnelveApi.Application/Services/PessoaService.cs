@@ -15,11 +15,11 @@ public class PessoaService : IPessoaService
         _pessoaRepository = pessoaRepository;
     }
 
-    public async Task<ApiResponse<PessoaDto>> GetByIdAsync(int id, string tenantId)
+    public async Task<ApiResponse<PessoaDto>> GetByIdAsync(int id)
     {
         try
         {
-            var pessoa = await _pessoaRepository.GetByIdAsync(id, tenantId);
+            var pessoa = await _pessoaRepository.GetByIdAsync(id);
             
             if (pessoa == null)
                 return ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada");
@@ -33,11 +33,11 @@ public class PessoaService : IPessoaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<PessoaDto>>> GetAllAsync(string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<PessoaDto>>> GetAllAsync()
     {
         try
         {
-            var pessoas = await _pessoaRepository.GetAllAsync(tenantId, includeDeleted);
+            var pessoas = await _pessoaRepository.GetAllAsync();
             var pessoasDto = PessoaMapping.ToDtoList(pessoas);
             
             return ApiResponse<IEnumerable<PessoaDto>>.SuccessResult(pessoasDto);
@@ -48,19 +48,13 @@ public class PessoaService : IPessoaService
         }
     }
 
-    public async Task<ApiResponse<PessoaDto>> CreateAsync(CreatePessoaDto createDto, string tenantId)
+    public async Task<ApiResponse<PessoaDto>> CreateAsync(CreatePessoaDto createDto)
     {
         try
         {
-            // Verificar se CPF já existe
-            if (await _pessoaRepository.CpfExistsAsync(createDto.CPF, tenantId))
-                return ApiResponse<PessoaDto>.ErrorResult("CPF já cadastrado para este tenant");
-
-            var pessoa = PessoaMapping.ToEntity(createDto, tenantId);
-            var pessoaCriada = await _pessoaRepository.AddAsync(pessoa);
-            var pessoaDto = PessoaMapping.ToDto(pessoaCriada);
-
-            return ApiResponse<PessoaDto>.SuccessResult(pessoaDto, "Pessoa criada com sucesso");
+            var pessoa = PessoaMapping.ToEntity(createDto);
+            var createdPessoa = await _pessoaRepository.AddAsync(pessoa);
+            return ApiResponse<PessoaDto>.SuccessResult(PessoaMapping.ToDto(createdPessoa), "Sucesso");
         }
         catch (Exception ex)
         {
@@ -68,17 +62,17 @@ public class PessoaService : IPessoaService
         }
     }
 
-    public async Task<ApiResponse<PessoaDto>> UpdateAsync(int id, UpdatePessoaDto updateDto, string tenantId)
+    public async Task<ApiResponse<PessoaDto>> UpdateAsync(int id, UpdatePessoaDto updateDto)
     {
         try
         {
-            var pessoa = await _pessoaRepository.GetByIdAsync(id, tenantId);
+            var pessoa = await _pessoaRepository.GetByIdAsync(id);
             
             if (pessoa == null)
                 return ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada");
 
             // Verificar se CPF já existe para outra pessoa
-            if (await _pessoaRepository.CpfExistsAsync(updateDto.CPF, tenantId, id))
+            if (await _pessoaRepository.CpfExistsAsync(updateDto.CPF))
                 return ApiResponse<PessoaDto>.ErrorResult("CPF já cadastrado para outra pessoa neste tenant");
 
             PessoaMapping.UpdateEntity(pessoa, updateDto);
@@ -93,16 +87,16 @@ public class PessoaService : IPessoaService
         }
     }
 
-    public async Task<ApiResponse<bool>> DeleteAsync(int id, string tenantId)
+    public async Task<ApiResponse<bool>> DeleteAsync(int id)
     {
         try
         {
-            var pessoa = await _pessoaRepository.GetByIdAsync(id, tenantId);
+            var pessoa = await _pessoaRepository.GetByIdAsync(id);
             
             if (pessoa == null)
                 return ApiResponse<bool>.ErrorResult("Pessoa não encontrada");
 
-            await _pessoaRepository.DeleteAsync(id, tenantId);
+            await _pessoaRepository.DeleteAsync(id);
             return ApiResponse<bool>.SuccessResult(true, "Pessoa excluída com sucesso");
         }
         catch (Exception ex)
@@ -111,11 +105,11 @@ public class PessoaService : IPessoaService
         }
     }
 
-    public async Task<ApiResponse<PessoaDto>> GetByCpfAsync(string cpf, string tenantId)
+    public async Task<ApiResponse<PessoaDto>> GetByCpfAsync(string cpf)
     {
         try
         {
-            var pessoa = await _pessoaRepository.GetByCpfAsync(cpf, tenantId);
+            var pessoa = await _pessoaRepository.GetByCpfAsync(cpf);
             
             if (pessoa == null)
                 return ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada");
@@ -129,11 +123,11 @@ public class PessoaService : IPessoaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<PessoaDto>>> GetByNomeAsync(string nome, string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<PessoaDto>>> GetByNomeAsync(string nome)
     {
         try
         {
-            var pessoas = await _pessoaRepository.GetByNomeAsync(nome, tenantId, includeDeleted);
+            var pessoas = await _pessoaRepository.GetByNomeAsync(nome);
             var pessoasDto = PessoaMapping.ToDtoList(pessoas);
             
             return ApiResponse<IEnumerable<PessoaDto>>.SuccessResult(pessoasDto);
