@@ -16,8 +16,21 @@ public class TenantMiddleware
 
     public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext)
     {
+
+
+
+
         try
         {
+            _logger.LogInformation("=== DEBUG TENANT MIDDLEWARE ===");
+            _logger.LogInformation("User authenticated: {IsAuth}", context.User.Identity?.IsAuthenticated);
+
+            if (context.User.Identity?.IsAuthenticated == true)
+            {
+                var allClaims = context.User.Claims.Select(c => $"{c.Type}: {c.Value}").ToList();
+                _logger.LogInformation("All claims: {Claims}", string.Join(", ", allClaims));
+            }
+
             // Extrair tenant do JWT
             var tenantId = ExtractTenantFromToken(context);
 
@@ -52,8 +65,8 @@ public class TenantMiddleware
             return null;
 
         // Extrair claim do tenant
-        var tenantClaim = context.User.FindFirst("tenantId") ??
-                         context.User.FindFirst("tenant_id") ??
+        var tenantClaim = context.User.FindFirst("TenantId") ??
+                         context.User.FindFirst("Tenant_id") ??
                          context.User.FindFirst(ClaimTypes.GroupSid);
 
         return tenantClaim?.Value;
