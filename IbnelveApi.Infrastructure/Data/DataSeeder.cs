@@ -63,10 +63,10 @@ public static class DataSeeder
             }
         }
     }
-
+    //Colocar o ignore query filter, pois filtra e acha que não tem registros e tenta colocar novamente.
     private static async Task SeedPessoasAsync(ApplicationDbContext context)
     {
-        if (!await context.Pessoas.AnyAsync())
+        if (!await context.Pessoas.IgnoreQueryFilters().AnyAsync())
         {
             var pessoas = new List<Pessoa>
             {
@@ -105,7 +105,7 @@ public static class DataSeeder
 
     private static async Task SeedTarefasAsync(ApplicationDbContext context)
     {
-        if (!await context.Tarefas.AnyAsync())
+        if (!await context.Tarefas.IgnoreQueryFilters().AnyAsync())
         {
             var tarefas = new List<Tarefa>
             {
