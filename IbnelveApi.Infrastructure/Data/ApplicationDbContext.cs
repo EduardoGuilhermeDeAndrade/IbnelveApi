@@ -1,12 +1,9 @@
-
-using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http;
 using System.Reflection;
 using System.Security.Claims;
 

@@ -17,6 +17,40 @@ namespace IbnelveApi.IoC;
 
 public static class DependencyInjection
 {
+    public static IServiceCollection AddAllDependencies(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddInfrastructure(configuration);
+        services.AddApplication();
+        services.AddRepositories();
+
+        return services;
+    }
+
+    public static IServiceCollection AddApplication(this IServiceCollection services)
+    {
+        // Application Services
+        services.AddScoped<IPessoaService, PessoaService>();
+        services.AddScoped<ITarefaService, TarefaService>();
+
+        // JWT Service
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+        // FluentValidation
+        services.AddValidatorsFromAssemblyContaining<CreatePessoaDtoValidator>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
+        // Repositories
+        services.AddScoped<IPessoaRepository, PessoaRepository>();
+        services.AddScoped<ITarefaRepository, TarefaRepository>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+        return services;
+    }
+
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Database
@@ -60,41 +94,11 @@ public static class DependencyInjection
             };
         });
 
-        return services;
-    }
-
-    public static IServiceCollection AddApplication(this IServiceCollection services)
-    {
-        // Application Services
-        services.AddScoped<IPessoaService, PessoaService>();
-        services.AddScoped<ITarefaService, TarefaService>();
-        
-        // JWT Service
-        services.AddScoped<IJwtTokenService, JwtTokenService>();
-
-        // FluentValidation
-        services.AddValidatorsFromAssemblyContaining<CreatePessoaDtoValidator>();
+        services.AddHttpContextAccessor();
 
         return services;
     }
 
-    public static IServiceCollection AddRepositories(this IServiceCollection services)
-    {
-        // Repositories
-        services.AddScoped<IPessoaRepository, PessoaRepository>();
-        services.AddScoped<ITarefaRepository, TarefaRepository>();
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-        return services;
-    }
-
-    public static IServiceCollection AddAllDependencies(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddInfrastructure(configuration);
-        services.AddApplication();
-        services.AddRepositories();
-
-        return services;
-    }
 }
 
