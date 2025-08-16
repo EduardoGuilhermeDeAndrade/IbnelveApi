@@ -1,4 +1,3 @@
-
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
@@ -22,7 +21,6 @@ public class PessoaController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponse<IEnumerable<PessoaDto>>>> GetAll()
     {
-        // Não precisa mais passar tenantId - é aplicado automaticamente
         var pessoas = await _pessoaService.GetAllAsync();
         return Ok(pessoas);
     }
@@ -30,28 +28,64 @@ public class PessoaController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<PessoaDto>>> GetById(int id)
     {
-        // Não precisa mais passar tenantId - é aplicado automaticamente
         var pessoa = await _pessoaService.GetByIdAsync(id);
 
-        if (pessoa == null)
-            return NotFound(ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada"));
+        if (!pessoa.Success)
+            return NotFound(pessoa);
 
-        return Ok((pessoa));
+        return Ok(pessoa);
     }
 
     [HttpGet("cpf/{cpf}")]
     public async Task<ActionResult<ApiResponse<PessoaDto>>> GetByCpf(string cpf)
     {
-        // Não precisa mais passar tenantId - é aplicado automaticamente
         var pessoa = await _pessoaService.GetByCpfAsync(cpf);
 
-        if (pessoa == null)
-            return NotFound(ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada"));
+        if (!pessoa.Success)
+            return NotFound(pessoa);
 
         return Ok(pessoa);
     }
 
-    // Outros métodos seguem o mesmo padrão...
+    [HttpGet("nome/{nome}")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<PessoaDto>>>> GetByNome(string nome)
+    {
+        var pessoas = await _pessoaService.GetByNomeAsync(nome);
+        return Ok(pessoas);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<PessoaDto>>> Create([FromBody] CreatePessoaDto createDto)
+    {
+    //Todo: Ver porque não está passando pelo validador. (isvalid)
+    
+        var result = await _pessoaService.CreateAsync(createDto);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ApiResponse<PessoaDto>>> Update(int id, [FromBody] UpdatePessoaDto updateDto)
+    {
+        var result = await _pessoaService.UpdateAsync(id, updateDto);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<ApiResponse<bool>>> Delete(int id)
+    {
+        var result = await _pessoaService.DeleteAsync(id);
+
+        if (!result.Success)
+            return NotFound(result);
+
+        return Ok(result);
+    }
 }
-
-
