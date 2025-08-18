@@ -65,6 +65,26 @@ public class PessoaController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
     }
 
+    [HttpGet("nome/{nome}")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<PessoaDto>>>> GetByNome(string nome)
+    {
+        var pessoas = await _pessoaService.GetByNomeAsync(nome);
+        return Ok(pessoas);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<ApiResponse<PessoaDto>>> Create([FromBody] CreatePessoaDto createDto)
+    {
+    //Todo: Ver porque não está passando pelo validador. (isvalid)
+    
+        var result = await _pessoaService.CreateAsync(createDto);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
+    }
+
     [HttpPut("{id}")]
     public async Task<ActionResult<ApiResponse<PessoaDto>>> Update(int id, [FromBody] UpdatePessoaDto updateDto)
     {
