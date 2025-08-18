@@ -72,8 +72,9 @@ public class PessoaService : IPessoaService
                 return ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada");
 
             // Verificar se CPF já existe para outra pessoa
-            if (await _pessoaRepository.CpfExistsAsync(updateDto.CPF))
-                return ApiResponse<PessoaDto>.ErrorResult("CPF já cadastrado para outra pessoa neste tenant");
+            // Claro que existe pois é alteração.
+            if (!await _pessoaRepository.CpfExistsAsync(updateDto.CPF))
+                return ApiResponse<PessoaDto>.ErrorResult("Usuário ainda não cadastrado neste tenant");
 
             PessoaMapping.UpdateEntity(pessoa, updateDto);
             var pessoaAtualizada = await _pessoaRepository.UpdateAsync(pessoa);

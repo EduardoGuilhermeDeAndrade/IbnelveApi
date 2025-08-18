@@ -2,11 +2,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using IbnelveApi.Infrastructure.Data;
 using IbnelveApi.IoC;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using IbnelveApi.Application.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-builder.Services.AddControllers();
+// Adiciona FluentValidation e registra os validators
+builder.Services
+    .AddControllers()
+    .AddFluentValidation(fv =>
+    {
+        fv.RegisterValidatorsFromAssemblyContaining<CreatePessoaDtoValidator>();
+    });
 
 // Add all dependencies (Infrastructure, Application, Repositories)
 builder.Services.AddAllDependencies(builder.Configuration);
