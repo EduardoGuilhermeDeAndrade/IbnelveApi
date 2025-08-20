@@ -1,7 +1,9 @@
+using FluentValidation;
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IbnelveApi.Api.Controllers;
@@ -11,10 +13,14 @@ namespace IbnelveApi.Api.Controllers;
 [Authorize]
 public class PessoaController : ControllerBase
 {
-    private readonly IPessoaService _pessoaService;
+    private readonly IValidator<CreatePessoaDto> _validatorCreate;
+    private readonly IValidator<UpdatePessoaDto> _validatorUpdate;
+    private readonly IPessoaService _pessoaService; // Seu serviço de negócio
 
-    public PessoaController(IPessoaService pessoaService)
+    public PessoaController(IValidator<CreatePessoaDto> validatorCreate, IValidator<UpdatePessoaDto> validatorUpdate, IPessoaService pessoaService)
     {
+        _validatorCreate = validatorCreate;
+        _validatorUpdate = validatorUpdate;
         _pessoaService = pessoaService;
     }
 
@@ -57,43 +63,34 @@ public class PessoaController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ApiResponse<PessoaDto>>> Create([FromBody] CreatePessoaDto createDto)
     {
-        var result = await _pessoaService.CreateAsync(createDto);
+        var validationResult = await _validatorCreate.ValidateAsync(createDto);
 
-        if (!result.Success)
-            return BadRequest(result);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
 
-        return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
-    }
+        var novaPessoa = await _pessoaService.CreateAsync(createDto);
 
-    [HttpGet("nome/{nome}")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<PessoaDto>>>> GetByNome(string nome)
-    {
-        var pessoas = await _pessoaService.GetByNomeAsync(nome);
-        return Ok(pessoas);
-    }
+        if (!novaPessoa.Success)
+            return BadRequest(novaPessoa);
 
-    [HttpPost]
-    public async Task<ActionResult<ApiResponse<PessoaDto>>> Create([FromBody] CreatePessoaDto createDto)
-    {
-    //Todo: Ver porque não está passando pelo validador. (isvalid)
-    
-        var result = await _pessoaService.CreateAsync(createDto);
-
-        if (!result.Success)
-            return BadRequest(result);
-
-        return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
+        return CreatedAtAction(nameof(GetById), new { id = novaPessoa.Data?.Id }, novaPessoa);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<ApiResponse<PessoaDto>>> Update(int id, [FromBody] UpdatePessoaDto updateDto)
     {
-        var result = await _pessoaService.UpdateAsync(id, updateDto);
+        var validationResult = await _validatorUpdate.ValidateAsync(updateDto);
 
-        if (!result.Success)
-            return BadRequest(result);
+        if (!validationResult.IsValid)
+            return BadRequest(validationResult.Errors);
 
-        return Ok(result);
+        var novaPessoa = await _pessoaService.UpdateAsync(id, updateDto);
+
+        if (!novaPessoa.Success)
+            return BadRequest(novaPessoa);
+
+        return Ok(novaPessoa);
+
     }
 
     [HttpDelete("{id}")]

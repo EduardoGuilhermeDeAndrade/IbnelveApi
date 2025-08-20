@@ -1,5 +1,6 @@
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.Extensions;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Mappings;
 using IbnelveApi.Domain.Interfaces;
@@ -52,6 +53,10 @@ public class PessoaService : IPessoaService
     {
         try
         {
+            createDto.CPF = createDto.CPF.RemoveSpecialCharacters();
+            createDto.Telefone = createDto.Telefone.RemoveSpecialCharacters();
+            createDto.Endereco.CEP = createDto.Endereco.CEP.RemoveSpecialCharacters();
+
             var pessoa = PessoaMapping.ToEntity(createDto);
             var createdPessoa = await _pessoaRepository.AddAsync(pessoa);
             return ApiResponse<PessoaDto>.SuccessResult(PessoaMapping.ToDto(createdPessoa), "Sucesso");
@@ -66,13 +71,16 @@ public class PessoaService : IPessoaService
     {
         try
         {
+            updateDto.CPF = updateDto.CPF.RemoveSpecialCharacters();
+            updateDto.Telefone = updateDto.Telefone.RemoveSpecialCharacters();
+            updateDto.Endereco.CEP = updateDto.Endereco.CEP.RemoveSpecialCharacters();
+
             var pessoa = await _pessoaRepository.GetByIdAsync(id);
             
             if (pessoa == null)
                 return ApiResponse<PessoaDto>.ErrorResult("Pessoa não encontrada");
 
-            // Verificar se CPF já existe para outra pessoa
-            // Claro que existe pois é alteração.
+            // CPF já existe, pois é alteração.
             if (!await _pessoaRepository.CpfExistsAsync(updateDto.CPF))
                 return ApiResponse<PessoaDto>.ErrorResult("Usuário ainda não cadastrado neste tenant");
 

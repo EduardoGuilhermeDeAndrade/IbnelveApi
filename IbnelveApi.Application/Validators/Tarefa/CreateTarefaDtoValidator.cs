@@ -2,7 +2,7 @@ using FluentValidation;
 using IbnelveApi.Application.DTOs;
 using IbnelveApi.Domain.Enums;
 
-namespace IbnelveApi.Application.Validators;
+namespace IbnelveApi.Application.Validators.Tarefa;
 
 public class CreateTarefaDtoValidator : AbstractValidator<CreateTarefaDto>
 {

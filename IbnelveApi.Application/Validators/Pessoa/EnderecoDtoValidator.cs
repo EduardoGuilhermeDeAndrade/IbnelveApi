@@ -1,7 +1,8 @@
 using FluentValidation;
 using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.Extensions;
 
-namespace IbnelveApi.Application.Validators;
+namespace IbnelveApi.Application.Validators.Pessoa;
 
 public class EnderecoDtoValidator : AbstractValidator<EnderecoDto>
 {
@@ -11,7 +12,7 @@ public class EnderecoDtoValidator : AbstractValidator<EnderecoDto>
             .NotEmpty().WithMessage("Rua é obrigatória")
             .MaximumLength(300).WithMessage("Rua deve ter no máximo 300 caracteres");
 
-        RuleFor(x => x.CEP)
+        RuleFor(x => x.CEP.RemoveSpecialCharacters())
             .NotEmpty().WithMessage("CEP é obrigatório")
             .Matches(@"^\d{8}$").WithMessage("CEP deve conter exatamente 8 dígitos");
 

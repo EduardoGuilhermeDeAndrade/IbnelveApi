@@ -21,8 +21,4 @@
     <ProjectReference Include="..\IbnelveApi.IoC\IbnelveApi.IoC.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>

@@ -8,10 +8,10 @@ using System.Text;
 using FluentValidation;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Services;
-using IbnelveApi.Application.Validators;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
 using IbnelveApi.Infrastructure.Repositories;
+using IbnelveApi.Application.Validators.Pessoa;
 
 namespace IbnelveApi.IoC;
 
