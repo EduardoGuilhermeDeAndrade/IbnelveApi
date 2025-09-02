@@ -66,7 +66,7 @@ public class PessoaController : ControllerBase
         var validationResult = await _validatorCreate.ValidateAsync(createDto);
 
         if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
+            throw new ValidationException(validationResult.Errors);
 
         var novaPessoa = await _pessoaService.CreateAsync(createDto);
 
@@ -82,7 +82,7 @@ public class PessoaController : ControllerBase
         var validationResult = await _validatorUpdate.ValidateAsync(updateDto);
 
         if (!validationResult.IsValid)
-            return BadRequest(validationResult.Errors);
+            throw new ValidationException(validationResult.Errors);
 
         var novaPessoa = await _pessoaService.UpdateAsync(id, updateDto);
 

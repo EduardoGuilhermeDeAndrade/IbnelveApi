@@ -96,11 +96,12 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<TarefaDto>> CreateAsync(CreateTarefaDto createDto, string tenantId)
+    public async Task<ApiResponse<TarefaDto>> CreateAsync(CreateTarefaDto createDto, string tenantId, string userId)
     {
         try
         {
-            var tarefa = TarefaMapping.ToEntity(createDto, tenantId);
+            var tarefa = TarefaMapping.ToEntity(createDto, tenantId, userId);
+
             var tarefaCriada = await _tarefaRepository.AddAsync(tarefa);
             var tarefaDto = TarefaMapping.ToDto(tarefaCriada);
 

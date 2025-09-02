@@ -1,8 +1,9 @@
 using IbnelveApi.Domain.Enums;
+using IbnelveApi.Domain.Interfaces;
 
 namespace IbnelveApi.Domain.Entities;
 
-public class Tarefa : BaseEntity
+public class Tarefa : BaseEntity, IUserScopedEntity
 {
     public string Titulo { get; set; } = string.Empty;
     public string Descricao { get; set; } = string.Empty;
@@ -11,10 +12,11 @@ public class Tarefa : BaseEntity
     public DateTime? DataVencimento { get; set; }
     public DateTime? DataConclusao { get; set; }
     public string? Categoria { get; set; }
+    public string? UserId { get; set; }
 
     public Tarefa() { }
 
-    public Tarefa(string titulo, string descricao, string tenantId, PrioridadeTarefa prioridade = PrioridadeTarefa.Media, DateTime? dataVencimento = null, string? categoria = null)
+    public Tarefa(string titulo, string descricao, string tenantId, string? userId, PrioridadeTarefa prioridade = PrioridadeTarefa.Media, DateTime? dataVencimento = null, string? categoria = null)
     {
         Titulo = titulo;
         Descricao = descricao;
@@ -23,6 +25,7 @@ public class Tarefa : BaseEntity
         DataVencimento = dataVencimento;
         Categoria = categoria;
         Status = StatusTarefa.Pendente;
+        UserId = userId;
     }
 
     public void AtualizarDados(string titulo, string descricao, PrioridadeTarefa prioridade, DateTime? dataVencimento = null, string? categoria = null)

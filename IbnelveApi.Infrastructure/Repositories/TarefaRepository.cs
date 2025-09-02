@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Enums;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IbnelveApi.Infrastructure.Repositories;
 

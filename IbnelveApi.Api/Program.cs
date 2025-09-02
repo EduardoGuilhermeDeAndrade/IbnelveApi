@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using IbnelveApi.Infrastructure.Data;
-using IbnelveApi.IoC;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using IbnelveApi.Api.middlewares;
 using IbnelveApi.Application.Validators.Pessoa;
+using IbnelveApi.Infrastructure.Data;
+using IbnelveApi.IoC;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +103,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+// Adicione o middleware ANTES do `app.UseAuthorization()`
+app.UseMiddleware<ValidationMiddleware>();
 
 app.UseAuthentication();
 

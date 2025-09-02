@@ -1,9 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace IbnelveApi.Api.Controllers;
 
@@ -22,6 +24,12 @@ public class TarefaController : ControllerBase
     private string GetTenantId()
     {
         return User.FindFirst("TenantId")?.Value ?? string.Empty;
+    }
+
+    private string GetUserId()
+    {
+
+        return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
     }
 
     /// <summary>
@@ -244,10 +252,12 @@ public class TarefaController : ControllerBase
             }
 
             var tenantId = GetTenantId();
+            var userId = GetUserId();
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.CreateAsync(createDto, tenantId);
+            var result = await _tarefaService.CreateAsync(createDto, userId, tenantId);
             
             if (result.Success)
                 return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);

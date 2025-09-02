@@ -24,19 +24,21 @@ public static class TarefaMapping
             CreatedAt = tarefa.CreatedAt,
             UpdatedAt = tarefa.UpdatedAt,
             EstaVencida = tarefa.EstaVencida(),
-            EstaConcluida = tarefa.EstaConcluida()
+            EstaConcluida = tarefa.EstaConcluida(),
+            
         };
     }
 
-    public static Tarefa ToEntity(CreateTarefaDto createDto, string tenantId)
+    public static Tarefa ToEntity(CreateTarefaDto createDto, string tenantId, string userId)
     {
         return new Tarefa(
             createDto.Titulo,
             createDto.Descricao,
             tenantId,
+            userId,
             createDto.Prioridade,
             createDto.DataVencimento,
-            createDto.Categoria
+            createDto.Categoria            
         );
     }
 

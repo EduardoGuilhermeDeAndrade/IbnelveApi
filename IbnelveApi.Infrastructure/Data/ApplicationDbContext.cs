@@ -1,9 +1,12 @@
 using IbnelveApi.Domain.Entities;
+using IbnelveApi.Domain.Extensions;
+using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Security.Claims;
 
@@ -53,45 +56,40 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             }
         }
     }
-    //private void ConfigureGlobalFilters(ModelBuilder modelBuilder)
-    //{
-    //    // Aplicar filtros globais para todas as entidades que herdam de BaseEntity
-    //    foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-    //    {
-    //        if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-    //        {
-    //            var method = typeof(ApplicationDbContext)
-    //                .GetMethod(nameof(SetGlobalQueryFilter), BindingFlags.NonPublic | BindingFlags.Static)
-    //                ?.MakeGenericMethod(entityType.ClrType);
 
-    //            method?.Invoke(null, new object[] { modelBuilder, _tenantContext });
-    //        }
-    //    }
-    //}
-
-    private void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder)
-        where T : BaseEntity
-    {
-        modelBuilder.Entity<T>().HasQueryFilter(e =>
-            !e.IsDeleted &&
-            GetCurrentTenantId() != null &&
-            e.TenantId == GetCurrentTenantId());
-    }
-    ////private static void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder)
-    ////where T : BaseEntity
-    ////{
-    ////    modelBuilder.Entity<T>().HasQueryFilter(e =>
-    ////        !e.IsDeleted &&
-    ////        EF.Property<string>(e, "TenantId") == GetCurrentTenantId());
-    ////}
-    //private static void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder, ITenantContext tenantContext)
+    //private void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder)
     //    where T : BaseEntity
     //{
     //    modelBuilder.Entity<T>().HasQueryFilter(e =>
     //        !e.IsDeleted &&
-    //        tenantContext.TenantId != null &&
-    //        e.TenantId == tenantContext.TenantId);
+    //        GetCurrentTenantId() != null &&
+    //        e.TenantId == GetCurrentTenantId()) 
+    //        ;
     //}
+    private void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder) where T : BaseEntity
+    {
+        var tenantId = GetCurrentTenantId();
+        var userId = GetCurrentUserId();
+
+        // Tenant obrigatório sempre
+        Expression<Func<T, bool>> filter = e =>
+            !e.IsDeleted &&
+            tenantId != null &&
+            e.TenantId == tenantId;
+
+        // Se a entidade também for "user-scoped", aplicar filtro adicional
+        if (typeof(IUserScopedEntity).IsAssignableFrom(typeof(T)))
+        {
+            Expression<Func<T, bool>> userFilter = e =>
+                ((IUserScopedEntity)e).UserId == userId;
+
+            // Combina com AND lógico
+            filter = filter.And(userFilter);
+        }
+
+        modelBuilder.Entity<T>().HasQueryFilter(filter);
+    }
+
 
     private string GetCurrentTenantId()
     {
@@ -108,23 +106,23 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         return null;
     }
-    //private static string GetCurrentTenantId()
-    //{
-    //    // Este método será chamado em runtime durante as queries
-    //    var httpContextAccessor = new HttpContextAccessor();
-    //    var httpContext = httpContextAccessor.HttpContext;
 
-    //    if (httpContext?.User?.Identity?.IsAuthenticated == true)
-    //    {
-    //        var tenantClaim = httpContext.User.FindFirst("tenantId") ??
-    //                         httpContext.User.FindFirst("tenant_id") ??
-    //                         httpContext.User.FindFirst(ClaimTypes.GroupSid);
+    private string? GetCurrentUserId()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
 
-    //        return tenantClaim?.Value;
-    //    }
+        if (httpContext?.User?.Identity?.IsAuthenticated == true)
+        {
+            var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier) ??
+                              httpContext.User.FindFirst("sub");
 
-    //    return null;
-    //}
+            return userIdClaim?.Value;
+        }
+
+        return null;
+    }
+
+
     private void ConfigureIdentityTables(ModelBuilder modelBuilder)
     {
         //Todo: Verificar se é necessário criar uma classe customizada para IdentityUser e IdentityRole para incluir TenantId diretamente
@@ -172,29 +170,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    //public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    //{
-    //    // Atualizar timestamps automaticamente
-    //    foreach (var entry in ChangeTracker.Entries<BaseEntity>())
-    //    {
-    //        switch (entry.State)
-    //        {
-    //            case EntityState.Added:
-    //                entry.Entity.CreatedAt = DateTime.UtcNow;
-    //                // Definir TenantId automaticamente se não estiver definido
-    //                if (string.IsNullOrEmpty(entry.Entity.TenantId) && _tenantContext.HasTenant)
-    //                {
-    //                    entry.Entity.TenantId = _tenantContext.TenantId!;
-    //                }
-    //                break;
-    //            case EntityState.Modified:
-    //                entry.Entity.UpdatedAt = DateTime.UtcNow;
-    //                break;
-    //        }
-    //    }
-
-    //    return await base.SaveChangesAsync(cancellationToken);
-    //}
+    
 }
 
 
