@@ -10,59 +10,59 @@ public static class DataSeeder
 {
     public static async Task SeedAsync(ApplicationDbContext context, UserManager<IdentityUser> userManager)
     {
-        ////Seed de usuários admin
-        //await SeedUsersAsync(userManager, context);
+        //Seed de usuários admin
+        await SeedUsersAsync(userManager, context);
 
-        //// Seed de pessoas
+        // Seed de pessoas
         //await SeedPessoasAsync(context);
 
-        //// Seed de tarefas
+        // Seed de tarefas
         //await SeedTarefasAsync(context);
     }
 
-    //private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager, ApplicationDbContext context)
-    //{
-    //    if (!await context.Users.AnyAsync())
-    //    {
+    private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager, ApplicationDbContext context)
+    {
+        if (!await context.Users.AnyAsync())
+        {
 
-    //        // Usuário admin para tenant1
-    //        var adminUser1 = await userManager.FindByEmailAsync("admin1@ibnelveapi.com");
-    //        if (adminUser1 == null)
-    //        {
-    //            adminUser1 = new IdentityUser
-    //            {
-    //                UserName = "admin1@ibnelveapi.com",
-    //                Email = "admin1@ibnelveapi.com",
-    //                EmailConfirmed = true
-    //            };
+            // Usuário admin para tenant1
+            var adminUser1 = await userManager.FindByEmailAsync("admin1@ibnelveapi.com");
+            if (adminUser1 == null)
+            {
+                adminUser1 = new IdentityUser
+                {
+                    UserName = "admin1@ibnelveapi.com",
+                    Email = "admin1@ibnelveapi.com",
+                    EmailConfirmed = true
+                };
 
-    //            var result = await userManager.CreateAsync(adminUser1, "Admin123!");
-    //            if (result.Succeeded)
-    //            {
-    //                // Adicionar TenantId via claim ou propriedade customizada
-    //                await userManager.AddClaimAsync(adminUser1, new System.Security.Claims.Claim("TenantId", "tenant1"));
-    //            }
-    //        }
+                var result = await userManager.CreateAsync(adminUser1, "Admin123!");
+                if (result.Succeeded)
+                {
+                    // Adicionar TenantId via claim ou propriedade customizada
+                    await userManager.AddClaimAsync(adminUser1, new System.Security.Claims.Claim("TenantId", "tenant1"));
+                }
+            }
 
-    //        // Usuário admin para tenant2
-    //        var adminUser2 = await userManager.FindByEmailAsync("admin2@ibnelveapi.com");
-    //        if (adminUser2 == null)
-    //        {
-    //            adminUser2 = new IdentityUser
-    //            {
-    //                UserName = "admin2@ibnelveapi.com",
-    //                Email = "admin2@ibnelveapi.com",
-    //                EmailConfirmed = true
-    //            };
+            // Usuário admin para tenant2
+            var adminUser2 = await userManager.FindByEmailAsync("admin2@ibnelveapi.com");
+            if (adminUser2 == null)
+            {
+                adminUser2 = new IdentityUser
+                {
+                    UserName = "admin2@ibnelveapi.com",
+                    Email = "admin2@ibnelveapi.com",
+                    EmailConfirmed = true
+                };
 
-    //            var result = await userManager.CreateAsync(adminUser2, "Admin123!");
-    //            if (result.Succeeded)
-    //            {
-    //                await userManager.AddClaimAsync(adminUser2, new System.Security.Claims.Claim("TenantId", "tenant2"));
-    //            }
-    //        }
-    //    }
-    //}
+                var result = await userManager.CreateAsync(adminUser2, "Admin123!");
+                if (result.Succeeded)
+                {
+                    await userManager.AddClaimAsync(adminUser2, new System.Security.Claims.Claim("TenantId", "tenant2"));
+                }
+            }
+        }
+    }
     //Colocar o ignore query filter, pois filtra e acha que não tem registros e tenta colocar novamente.
     //private static async Task SeedPessoasAsync(ApplicationDbContext context)
     //{
@@ -143,7 +143,7 @@ public static class DataSeeder
     //                DateTime.UtcNow.AddDays(-2), // Vencida
     //                "Qualidade"
     //            ),
-                
+
     //            // Tarefas para tenant2
     //            new Tarefa(
     //                "Implementar sistema de tarefas",

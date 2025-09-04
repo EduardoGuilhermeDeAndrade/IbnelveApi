@@ -91,21 +91,22 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     }
 
 
-    private string GetCurrentTenantId()
+    private string? GetCurrentTenantId()
     {
         var httpContext = _httpContextAccessor.HttpContext;
 
         if (httpContext?.User?.Identity?.IsAuthenticated == true)
         {
-            var tenantClaim = httpContext.User.FindFirst("TenantId") ??
-                             httpContext.User.FindFirst("Tenant_id") ??
-                             httpContext.User.FindFirst(ClaimTypes.GroupSid);
+            var tenantClaim = httpContext.User.FindFirst("TenantId")
+                             ?? httpContext.User.FindFirst("Tenant_id")
+                             ?? httpContext.User.FindFirst(ClaimTypes.GroupSid);
 
-            return tenantClaim?.Value;
+            return tenantClaim?.Value; // só acessa Value se não for null
         }
 
         return null;
     }
+
 
     private string? GetCurrentUserId()
     {

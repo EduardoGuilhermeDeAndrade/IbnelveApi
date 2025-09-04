@@ -3,16 +3,20 @@ using IbnelveApi.Domain.Enums;
 
 namespace IbnelveApi.Domain.Interfaces;
 
-public interface ITarefaRepository : IRepository<Tarefa>
+/// <summary>
+/// Interface para repositório de Tarefas (entidade específica do usuário)
+/// ATUALIZADA: Agora herda de IUserOwnedRepository e todos os métodos recebem userId E tenantId
+/// </summary>
+public interface ITarefaRepository : IUserOwnedRepository<Tarefa>
 {
-    Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status, string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> GetByCategoriaAsync(string categoria, string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> GetByTituloAsync(string titulo, string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> GetVencidasAsync(string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> GetConcluidasAsync(string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> SearchAsync(string searchTerm, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status, string userId, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string userId, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> GetByCategoriaAsync(string categoria, string userId, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> GetVencidasAsync(string userId, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> GetConcluidasAsync(string userId, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> SearchAsync(string searchTerm, string userId, string tenantId, bool includeDeleted = false);
     Task<IEnumerable<Tarefa>> GetWithFiltersAsync(
+        string userId,
         string tenantId,
         StatusTarefa? status = null,
         PrioridadeTarefa? prioridade = null,

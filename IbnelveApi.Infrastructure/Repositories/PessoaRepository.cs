@@ -1,4 +1,3 @@
-
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
@@ -6,32 +5,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IbnelveApi.Infrastructure.Repositories;
 
+/// <summary>
+/// Repositório para Pessoa - VERSÃO SIMPLES
+/// CORRIGIDO: Substitui _dbSet por _context.Set<Pessoa>()
+/// </summary>
 public class PessoaRepository : Repository<Pessoa>, IPessoaRepository
 {
-    public PessoaRepository(ApplicationDbContext context ) : base(context)
+    public PessoaRepository(ApplicationDbContext context) : base(context)
     {
     }
 
     public async Task<Pessoa?> GetByCpfAsync(string cpf)
     {
-        // Global filters aplicados automaticamente - sem necessidade de filtrar tenant
-        return await _dbSet
+        //  CORRIGIDO: _dbSet  _context.Set<Pessoa>()
+        return await _context.Set<Pessoa>()
             .Where(p => p.CPF == cpf)
             .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Pessoa>> GetByNomeAsync(string nome)
     {
-        // Global filters aplicados automaticamente - sem necessidade de filtrar tenant
-        return await _dbSet
+        //  CORRIGIDO: _dbSet  _context.Set<Pessoa>()
+        return await _context.Set<Pessoa>()
             .Where(p => p.Nome.Contains(nome))
             .ToListAsync();
     }
 
     public async Task<bool> CpfExistsAsync(string cpf, int? excludeId = null)
     {
-        // Global filters aplicados automaticamente
-        var query = _dbSet.Where(p => p.CPF == cpf);
+        //  CORRIGIDO: _dbSet  _context.Set<Pessoa>()
+        var query = _context.Set<Pessoa>().Where(p => p.CPF == cpf);
 
         if (excludeId.HasValue)
         {
@@ -41,6 +44,4 @@ public class PessoaRepository : Repository<Pessoa>, IPessoaRepository
         return await query.AnyAsync();
     }
 }
-
-
 

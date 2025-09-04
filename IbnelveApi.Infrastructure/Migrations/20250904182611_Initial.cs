@@ -25,10 +25,10 @@ namespace IbnelveApi.Infrastructure.Migrations
                     EnderecoBairro = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EnderecoCidade = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EnderecoUF = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
-                    TenantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,10 +62,11 @@ namespace IbnelveApi.Infrastructure.Migrations
                     DataVencimento = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DataConclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Categoria = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    TenantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

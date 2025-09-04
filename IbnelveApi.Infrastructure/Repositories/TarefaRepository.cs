@@ -1,116 +1,82 @@
+using Microsoft.EntityFrameworkCore;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Enums;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace IbnelveApi.Infrastructure.Repositories;
 
-public class TarefaRepository : Repository<Tarefa>, ITarefaRepository
+/// <summary>
+/// Repositório específico para Tarefas - herda de UserOwnedRepository
+/// ATUALIZADO: Aplica automaticamente filtros por UserId E TenantId
+/// </summary>
+public class TarefaRepository : UserOwnedRepository<Tarefa>, ITarefaRepository
 {
     public TarefaRepository(ApplicationDbContext context) : base(context)
     {
     }
 
-    public async Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status, string tenantId, bool includeDeleted = false)
+    // ✅ Os métodos GetByIdAsync, GetAllAsync e GetByUserAsync já são herdados da classe base
+    // e aplicam automaticamente os filtros por UserId E TenantId
+
+    public async Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status, string userId, string tenantId, bool includeDeleted = false)
     {
-        var query = _dbSet.Where(t => t.Status == status && t.TenantId == tenantId);
-
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => t.TenantId == tenantId && t.Status == status);
-        }
-
-        return await query.OrderByDescending(t => t.CreatedAt).ToListAsync();
+        return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
+            .Where(t => t.Status == status)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tarefa>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<Tarefa>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string userId, string tenantId, bool includeDeleted = false)
     {
-        var query = _dbSet.Where(t => t.Prioridade == prioridade && t.TenantId == tenantId);
-
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => t.TenantId == tenantId && t.Prioridade == prioridade);
-        }
-
-        return await query.OrderByDescending(t => t.CreatedAt).ToListAsync();
+        return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
+            .Where(t => t.Prioridade == prioridade)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tarefa>> GetByCategoriaAsync(string categoria, string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<Tarefa>> GetByCategoriaAsync(string categoria, string userId, string tenantId, bool includeDeleted = false)
     {
-        var query = _dbSet.Where(t => t.Categoria == categoria && t.TenantId == tenantId);
-
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => t.TenantId == tenantId && t.Categoria == categoria);
-        }
-
-        return await query.OrderByDescending(t => t.CreatedAt).ToListAsync();
+        return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
+            .Where(t => t.Categoria == categoria)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tarefa>> GetByTituloAsync(string titulo, string tenantId, bool includeDeleted = false)
-    {
-        var query = _dbSet.Where(t => t.Titulo.Contains(titulo) && t.TenantId == tenantId);
-
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => t.TenantId == tenantId && t.Titulo.Contains(titulo));
-        }
-
-        return await query.OrderByDescending(t => t.CreatedAt).ToListAsync();
-    }
-
-    public async Task<IEnumerable<Tarefa>> GetVencidasAsync(string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<Tarefa>> GetVencidasAsync(string userId, string tenantId, bool includeDeleted = false)
     {
         var hoje = DateTime.UtcNow.Date;
-        var query = _dbSet.Where(t => 
-            t.TenantId == tenantId && 
-            t.DataVencimento.HasValue && 
-            t.DataVencimento.Value.Date < hoje && 
-            t.Status != StatusTarefa.Concluida);
 
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => 
-                t.TenantId == tenantId && 
-                t.DataVencimento.HasValue && 
-                t.DataVencimento.Value.Date < hoje && 
-                t.Status != StatusTarefa.Concluida);
-        }
-
-        return await query.OrderBy(t => t.DataVencimento).ToListAsync();
+        return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
+            .Where(t => t.DataVencimento.HasValue &&
+                       t.DataVencimento.Value.Date < hoje &&
+                       t.Status != StatusTarefa.Concluida)
+            .OrderBy(t => t.DataVencimento)
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tarefa>> GetConcluidasAsync(string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<Tarefa>> GetConcluidasAsync(string userId, string tenantId, bool includeDeleted = false)
     {
-        var query = _dbSet.Where(t => t.Status == StatusTarefa.Concluida && t.TenantId == tenantId);
-
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => t.TenantId == tenantId && t.Status == StatusTarefa.Concluida);
-        }
-
-        return await query.OrderByDescending(t => t.DataConclusao).ToListAsync();
+        return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
+            .Where(t => t.Status == StatusTarefa.Concluida)
+            .OrderByDescending(t => t.DataConclusao)
+            .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tarefa>> SearchAsync(string searchTerm, string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<Tarefa>> SearchAsync(string searchTerm, string userId, string tenantId, bool includeDeleted = false)
     {
-        var query = _dbSet.Where(t => 
-            t.TenantId == tenantId && 
-            (t.Titulo.Contains(searchTerm) || t.Descricao.Contains(searchTerm)));
+        var termLower = searchTerm.ToLower();
 
-        if (includeDeleted)
-        {
-            query = query.IgnoreQueryFilters().Where(t => 
-                t.TenantId == tenantId && 
-                (t.Titulo.Contains(searchTerm) || t.Descricao.Contains(searchTerm)));
-        }
-
-        return await query.OrderByDescending(t => t.CreatedAt).ToListAsync();
+        return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
+            .Where(t => t.Titulo.ToLower().Contains(termLower) ||
+                       t.Descricao.ToLower().Contains(termLower) ||
+                       (t.Categoria != null && t.Categoria.ToLower().Contains(termLower)))
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Tarefa>> GetWithFiltersAsync(
+        string userId,
         string tenantId,
         StatusTarefa? status = null,
         PrioridadeTarefa? prioridade = null,
@@ -120,10 +86,9 @@ public class TarefaRepository : Repository<Tarefa>, ITarefaRepository
         bool includeDeleted = false,
         string orderBy = "CreatedAt")
     {
-        var query = includeDeleted 
-            ? _dbSet.IgnoreQueryFilters().Where(t => t.TenantId == tenantId)
-            : _dbSet.Where(t => t.TenantId == tenantId);
+        var query = ApplyUserAndTenantFilter(userId, tenantId, includeDeleted);
 
+        // Aplicar filtros opcionais
         if (status.HasValue)
             query = query.Where(t => t.Status == status.Value);
 
@@ -145,9 +110,8 @@ public class TarefaRepository : Repository<Tarefa>, ITarefaRepository
             "titulo" => query.OrderBy(t => t.Titulo),
             "status" => query.OrderBy(t => t.Status),
             "prioridade" => query.OrderByDescending(t => t.Prioridade),
-            "datavencimento" => query.OrderBy(t => t.DataVencimento),
-            "dataconclusao" => query.OrderByDescending(t => t.DataConclusao),
-            "updatedat" => query.OrderByDescending(t => t.UpdatedAt),
+            "vencimento" => query.OrderBy(t => t.DataVencimento),
+            "createdat" => query.OrderByDescending(t => t.CreatedAt),
             _ => query.OrderByDescending(t => t.CreatedAt)
         };
 

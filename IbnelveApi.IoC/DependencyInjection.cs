@@ -21,43 +21,50 @@ public static class DependencyInjection
     {
         services.AddInfrastructure(configuration);
         services.AddApplication();
-        services.AddRepositories();
 
         return services;
     }
 
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Application Services
+        // ===== APPLICATION SERVICES =====
         services.AddScoped<IPessoaService, PessoaService>();
         services.AddScoped<ITarefaService, TarefaService>();
+
+        //  ADICIONADO: Serviço para capturar contexto do usuário atual
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // JWT Service
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-        // FluentValidation
+        // ===== VALIDATION =====
         services.AddValidatorsFromAssemblyContaining<CreatePessoaDtoValidator>();
 
-        return services;
-    }
+        // ===== REPOSITORIES =====
 
-    public static IServiceCollection AddRepositories(this IServiceCollection services)
-    {
-        // Repositories
+        // Repositório genérico base
+
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+        // Repositórios base por tipo de entidade
+        services.AddScoped(typeof(IGlobalRepository<>), typeof(GlobalRepository<>));
+        services.AddScoped(typeof(ITenantRepository<>), typeof(TenantRepository<>));
+        services.AddScoped(typeof(IUserOwnedRepository<>), typeof(UserOwnedRepository<>));
+
+        // Repositórios específicos existentes
         services.AddScoped<IPessoaRepository, PessoaRepository>();
         services.AddScoped<ITarefaRepository, TarefaRepository>();
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         return services;
     }
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // Database
+        // ===== DATABASE =====
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        // Identity
+        // ===== IDENTITY =====
         services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
@@ -70,7 +77,7 @@ public static class DependencyInjection
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
-        // JWT Authentication
+        // ===== JWT AUTHENTICATION =====
         var jwtSettings = configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"];
 
@@ -94,11 +101,10 @@ public static class DependencyInjection
             };
         });
 
+        //  ADICIONADO: HttpContextAccessor é necessário para o CurrentUserService
         services.AddHttpContextAccessor();
 
         return services;
     }
-
-
 }
 

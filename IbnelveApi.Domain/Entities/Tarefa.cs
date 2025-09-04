@@ -1,9 +1,11 @@
 using IbnelveApi.Domain.Enums;
-using IbnelveApi.Domain.Interfaces;
 
 namespace IbnelveApi.Domain.Entities;
 
-public class Tarefa : BaseEntity, IUserScopedEntity
+/// <summary>
+/// Entidade Tarefa - herda de UserOwnedEntity pois tarefas são específicas do usuário
+/// </summary>
+public class Tarefa : UserOwnedEntity
 {
     public string Titulo { get; set; } = string.Empty;
     public string Descricao { get; set; } = string.Empty;
@@ -12,20 +14,21 @@ public class Tarefa : BaseEntity, IUserScopedEntity
     public DateTime? DataVencimento { get; set; }
     public DateTime? DataConclusao { get; set; }
     public string? Categoria { get; set; }
-    public string? UserId { get; set; }
 
     public Tarefa() { }
 
-    public Tarefa(string titulo, string descricao, string tenantId, string? userId, PrioridadeTarefa prioridade = PrioridadeTarefa.Media, DateTime? dataVencimento = null, string? categoria = null)
+    public Tarefa(string titulo, string descricao, string userId, string tenantId,
+                  PrioridadeTarefa prioridade = PrioridadeTarefa.Media,
+                  DateTime? dataVencimento = null, string? categoria = null)
     {
         Titulo = titulo;
         Descricao = descricao;
-        TenantId = tenantId;
+        UserId = userId;        //  Específico do usuário
+        TenantId = tenantId;    //  Específico do tenant
         Prioridade = prioridade;
         DataVencimento = dataVencimento;
         Categoria = categoria;
         Status = StatusTarefa.Pendente;
-        UserId = userId;
     }
 
     public void AtualizarDados(string titulo, string descricao, PrioridadeTarefa prioridade, DateTime? dataVencimento = null, string? categoria = null)
@@ -41,7 +44,7 @@ public class Tarefa : BaseEntity, IUserScopedEntity
     public void AlterarStatus(StatusTarefa novoStatus)
     {
         Status = novoStatus;
-        
+
         if (novoStatus == StatusTarefa.Concluida)
         {
             DataConclusao = DateTime.UtcNow;
@@ -50,7 +53,7 @@ public class Tarefa : BaseEntity, IUserScopedEntity
         {
             DataConclusao = null;
         }
-        
+
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -76,8 +79,8 @@ public class Tarefa : BaseEntity, IUserScopedEntity
 
     public bool EstaVencida()
     {
-        return DataVencimento.HasValue && 
-               DataVencimento.Value.Date < DateTime.UtcNow.Date && 
+        return DataVencimento.HasValue &&
+               DataVencimento.Value.Date < DateTime.UtcNow.Date &&
                Status != StatusTarefa.Concluida;
     }
 

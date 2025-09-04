@@ -2,11 +2,16 @@ using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Mappings;
+using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Enums;
 using IbnelveApi.Domain.Interfaces;
 
 namespace IbnelveApi.Application.Services;
 
+/// <summary>
+/// Serviço de Tarefas
+/// ATUALIZADO: Todos os métodos agora usam userId E tenantId para filtros globais
+/// </summary>
 public class TarefaService : ITarefaService
 {
     private readonly ITarefaRepository _tarefaRepository;
@@ -16,12 +21,12 @@ public class TarefaService : ITarefaService
         _tarefaRepository = tarefaRepository;
     }
 
-    public async Task<ApiResponse<TarefaDto>> GetByIdAsync(int id, string tenantId)
+    public async Task<ApiResponse<TarefaDto>> GetByIdAsync(int id, string userId, string tenantId)
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id);
-            
+            var tarefa = await _tarefaRepository.GetByIdAsync(id, userId, tenantId);
+
             if (tarefa == null)
                 return ApiResponse<TarefaDto>.ErrorResult("Tarefa não encontrada");
 
@@ -34,13 +39,13 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetAllAsync(string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetAllAsync(string userId, string tenantId, bool includeDeleted = false)
     {
         try
         {
-            var tarefas = await _tarefaRepository.GetAllAsync();
+            var tarefas = await _tarefaRepository.GetAllAsync(userId, tenantId, includeDeleted);
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
-            
+
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
         }
         catch (Exception ex)
@@ -49,28 +54,20 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetWithFiltersAsync(TarefaFiltroDto filtro, string tenantId)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetWithFiltersAsync(TarefaFiltroDto filtro, string userId, string tenantId)
     {
         try
         {
-            IEnumerable<Domain.Entities.Tarefa> tarefas;
-
-            if (!string.IsNullOrEmpty(filtro.SearchTerm))
-            {
-                tarefas = await _tarefaRepository.SearchAsync(filtro.SearchTerm, tenantId, filtro.IncludeDeleted);
-            }
-            else
-            {
-                tarefas = await _tarefaRepository.GetWithFiltersAsync(
-                    tenantId,
-                    filtro.Status,
-                    filtro.Prioridade,
-                    filtro.Categoria,
-                    filtro.DataVencimentoInicio,
-                    filtro.DataVencimentoFim,
-                    filtro.IncludeDeleted,
-                    filtro.OrderBy);
-            }
+            var tarefas = await _tarefaRepository.GetWithFiltersAsync(
+                userId,
+                tenantId,
+                filtro.Status,
+                filtro.Prioridade,
+                filtro.Categoria,
+                filtro.DataVencimentoInicio,
+                filtro.DataVencimentoFim,
+                filtro.IncludeDeleted,
+                filtro.OrderBy ?? "CreatedAt");
 
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
@@ -81,13 +78,13 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> SearchAsync(string searchTerm, string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> SearchAsync(string searchTerm, string userId, string tenantId, bool includeDeleted = false)
     {
         try
         {
-            var tarefas = await _tarefaRepository.SearchAsync(searchTerm, tenantId, includeDeleted);
+            var tarefas = await _tarefaRepository.SearchAsync(searchTerm, userId, tenantId, includeDeleted);
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
-            
+
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
         }
         catch (Exception ex)
@@ -96,11 +93,19 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<TarefaDto>> CreateAsync(CreateTarefaDto createDto, string tenantId, string userId)
+    public async Task<ApiResponse<TarefaDto>> CreateAsync(CreateTarefaDto createDto, string userId, string tenantId)
     {
         try
         {
-            var tarefa = TarefaMapping.ToEntity(createDto, tenantId, userId);
+            var tarefa = new Tarefa(
+                createDto.Titulo,
+                createDto.Descricao,
+                userId,
+                tenantId,
+                createDto.Prioridade,
+                createDto.DataVencimento,
+                createDto.Categoria
+            );
 
             var tarefaCriada = await _tarefaRepository.AddAsync(tarefa);
             var tarefaDto = TarefaMapping.ToDto(tarefaCriada);
@@ -113,16 +118,23 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<TarefaDto>> UpdateAsync(int id, UpdateTarefaDto updateDto, string tenantId)
+    public async Task<ApiResponse<TarefaDto>> UpdateAsync(int id, UpdateTarefaDto updateDto, string userId, string tenantId)
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id);
-            
+            var tarefa = await _tarefaRepository.GetByIdAsync(id, userId, tenantId);
+
             if (tarefa == null)
                 return ApiResponse<TarefaDto>.ErrorResult("Tarefa não encontrada");
 
-            TarefaMapping.UpdateEntity(tarefa, updateDto);
+            tarefa.AtualizarDados(
+                updateDto.Titulo,
+                updateDto.Descricao,
+                updateDto.Prioridade,
+                updateDto.DataVencimento,
+                updateDto.Categoria
+            );
+
             var tarefaAtualizada = await _tarefaRepository.UpdateAsync(tarefa);
             var tarefaDto = TarefaMapping.ToDto(tarefaAtualizada);
 
@@ -134,16 +146,17 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<TarefaDto>> UpdateStatusAsync(int id, StatusTarefa status, string tenantId)
+    public async Task<ApiResponse<TarefaDto>> UpdateStatusAsync(int id, StatusTarefa status, string userId, string tenantId)
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id);
-            
+            var tarefa = await _tarefaRepository.GetByIdAsync(id, userId, tenantId);
+
             if (tarefa == null)
                 return ApiResponse<TarefaDto>.ErrorResult("Tarefa não encontrada");
 
             tarefa.AlterarStatus(status);
+
             var tarefaAtualizada = await _tarefaRepository.UpdateAsync(tarefa);
             var tarefaDto = TarefaMapping.ToDto(tarefaAtualizada);
 
@@ -155,26 +168,28 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<TarefaDto>> MarcarComoConcluidaAsync(int id, string tenantId)
+    public async Task<ApiResponse<TarefaDto>> MarcarComoConcluidaAsync(int id, string userId, string tenantId)
     {
-        return await UpdateStatusAsync(id, StatusTarefa.Concluida, tenantId);
+        return await UpdateStatusAsync(id, StatusTarefa.Concluida, userId, tenantId);
     }
 
-    public async Task<ApiResponse<TarefaDto>> MarcarComoPendenteAsync(int id, string tenantId)
+    public async Task<ApiResponse<TarefaDto>> MarcarComoPendenteAsync(int id, string userId, string tenantId)
     {
-        return await UpdateStatusAsync(id, StatusTarefa.Pendente, tenantId);
+        return await UpdateStatusAsync(id, StatusTarefa.Pendente, userId, tenantId);
     }
 
-    public async Task<ApiResponse<bool>> DeleteAsync(int id, string tenantId)
+    public async Task<ApiResponse<bool>> DeleteAsync(int id, string userId, string tenantId)
     {
         try
         {
-            var tarefa = await _tarefaRepository.GetByIdAsync(id);
-            
+            var tarefa = await _tarefaRepository.GetByIdAsync(id, userId, tenantId);
+
             if (tarefa == null)
                 return ApiResponse<bool>.ErrorResult("Tarefa não encontrada");
 
-            await _tarefaRepository.DeleteAsync(id);
+            tarefa.ExcluirLogicamente();
+            await _tarefaRepository.UpdateAsync(tarefa);
+
             return ApiResponse<bool>.SuccessResult(true, "Tarefa excluída com sucesso");
         }
         catch (Exception ex)
@@ -183,13 +198,13 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetByStatusAsync(StatusTarefa status, string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetByStatusAsync(StatusTarefa status, string userId, string tenantId, bool includeDeleted = false)
     {
         try
         {
-            var tarefas = await _tarefaRepository.GetByStatusAsync(status, tenantId, includeDeleted);
+            var tarefas = await _tarefaRepository.GetByStatusAsync(status, userId, tenantId, includeDeleted);
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
-            
+
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
         }
         catch (Exception ex)
@@ -198,13 +213,13 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string userId, string tenantId, bool includeDeleted = false)
     {
         try
         {
-            var tarefas = await _tarefaRepository.GetByPrioridadeAsync(prioridade, tenantId, includeDeleted);
+            var tarefas = await _tarefaRepository.GetByPrioridadeAsync(prioridade, userId, tenantId, includeDeleted);
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
-            
+
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
         }
         catch (Exception ex)
@@ -213,13 +228,13 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetVencidasAsync(string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetVencidasAsync(string userId, string tenantId, bool includeDeleted = false)
     {
         try
         {
-            var tarefas = await _tarefaRepository.GetVencidasAsync(tenantId, includeDeleted);
+            var tarefas = await _tarefaRepository.GetVencidasAsync(userId, tenantId, includeDeleted);
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
-            
+
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
         }
         catch (Exception ex)
@@ -228,13 +243,13 @@ public class TarefaService : ITarefaService
         }
     }
 
-    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetConcluidasAsync(string tenantId, bool includeDeleted = false)
+    public async Task<ApiResponse<IEnumerable<TarefaDto>>> GetConcluidasAsync(string userId, string tenantId, bool includeDeleted = false)
     {
         try
         {
-            var tarefas = await _tarefaRepository.GetConcluidasAsync(tenantId, includeDeleted);
+            var tarefas = await _tarefaRepository.GetConcluidasAsync(userId, tenantId, includeDeleted);
             var tarefasDto = TarefaMapping.ToDtoList(tarefas);
-            
+
             return ApiResponse<IEnumerable<TarefaDto>>.SuccessResult(tarefasDto);
         }
         catch (Exception ex)

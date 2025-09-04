@@ -3,9 +3,7 @@ using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace IbnelveApi.Api.Controllers;
 
@@ -15,25 +13,16 @@ namespace IbnelveApi.Api.Controllers;
 public class TarefaController : ControllerBase
 {
     private readonly ITarefaService _tarefaService;
+    private readonly ICurrentUserService _currentUserService; //  ADICIONADO
 
-    public TarefaController(ITarefaService tarefaService)
+    public TarefaController(ITarefaService tarefaService, ICurrentUserService currentUserService) //  MODIFICADO
     {
         _tarefaService = tarefaService;
-    }
-
-    private string GetTenantId()
-    {
-        return User.FindFirst("TenantId")?.Value ?? string.Empty;
-    }
-
-    private string GetUserId()
-    {
-
-        return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        _currentUserService = currentUserService; //  ADICIONADO
     }
 
     /// <summary>
-    /// Lista todas as tarefas do tenant
+    /// Lista todas as tarefas do usuário
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<ApiResponse<IEnumerable<TarefaDto>>>> GetAll(
@@ -41,15 +30,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.GetAllAsync(tenantId, includeDeleted);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.GetAllAsync(userId, tenantId, includeDeleted); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -74,9 +68,14 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    // NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("TenantId não encontrado"));
+
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("UserId não encontrado"));
 
             var filtro = new TarefaFiltroDto
             {
@@ -90,11 +89,11 @@ public class TarefaController : ControllerBase
                 SearchTerm = searchTerm
             };
 
-            var result = await _tarefaService.GetWithFiltersAsync(filtro, tenantId);
-            
+            var result = await _tarefaService.GetWithFiltersAsync(filtro, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -111,15 +110,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.GetByIdAsync(id, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<TarefaDto>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.GetByIdAsync(id, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return NotFound(result);
         }
         catch (Exception ex)
@@ -141,15 +145,20 @@ public class TarefaController : ControllerBase
             if (string.IsNullOrWhiteSpace(searchTerm))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("Termo de busca é obrigatório"));
 
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.SearchAsync(searchTerm, tenantId, includeDeleted);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.SearchAsync(searchTerm, userId, tenantId, includeDeleted); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -168,15 +177,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.GetByStatusAsync(status, tenantId, includeDeleted);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.GetByStatusAsync(status, userId, tenantId, includeDeleted); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -194,15 +208,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.GetVencidasAsync(tenantId, includeDeleted);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.GetVencidasAsync(userId, tenantId, includeDeleted); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -220,15 +239,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.GetConcluidasAsync(tenantId, includeDeleted);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<IEnumerable<TarefaDto>>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.GetConcluidasAsync(userId, tenantId, includeDeleted); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -251,17 +275,20 @@ public class TarefaController : ControllerBase
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("Dados inválidos", errors));
             }
 
-            var tenantId = GetTenantId();
-            var userId = GetUserId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); // NOVO
 
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.CreateAsync(createDto, userId, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<TarefaDto>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.CreateAsync(createDto, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
@@ -284,15 +311,20 @@ public class TarefaController : ControllerBase
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("Dados inválidos", errors));
             }
 
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.UpdateAsync(id, updateDto, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<TarefaDto>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.UpdateAsync(id, updateDto, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return NotFound(result);
         }
         catch (Exception ex)
@@ -309,15 +341,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.UpdateStatusAsync(id, statusDto.Status, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<TarefaDto>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.UpdateStatusAsync(id, statusDto.Status, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return NotFound(result);
         }
         catch (Exception ex)
@@ -334,15 +371,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.MarcarComoConcluidaAsync(id, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<TarefaDto>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.MarcarComoConcluidaAsync(id, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return NotFound(result);
         }
         catch (Exception ex)
@@ -359,15 +401,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<TarefaDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.MarcarComoPendenteAsync(id, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<TarefaDto>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.MarcarComoPendenteAsync(id, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return NotFound(result);
         }
         catch (Exception ex)
@@ -384,15 +431,20 @@ public class TarefaController : ControllerBase
     {
         try
         {
-            var tenantId = GetTenantId();
+            var userId = _currentUserService.GetUserId();    //  NOVO
+            var tenantId = _currentUserService.GetTenantId(); //  NOVO
+
             if (string.IsNullOrEmpty(tenantId))
                 return BadRequest(ApiResponse<bool>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _tarefaService.DeleteAsync(id, tenantId);
-            
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(ApiResponse<bool>.ErrorResult("UserId não encontrado"));
+
+            var result = await _tarefaService.DeleteAsync(id, userId, tenantId); //  MODIFICADO
+
             if (result.Success)
                 return Ok(result);
-            
+
             return NotFound(result);
         }
         catch (Exception ex)

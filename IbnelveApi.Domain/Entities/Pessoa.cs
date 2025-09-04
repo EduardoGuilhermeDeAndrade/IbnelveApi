@@ -37,10 +37,10 @@ public class Pessoa : BaseEntity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void ExcluirLogicamente()
-    {
-        IsDeleted = true;
-        UpdatedAt = DateTime.UtcNow;
-    }
+    //public void ExcluirLogicamente()
+    //{
+    //    IsDeleted = true;
+    //    UpdatedAt = DateTime.UtcNow;
+    //}
 }
 

@@ -1,9 +1,11 @@
-
 using IbnelveApi.Domain.Entities;
 
 namespace IbnelveApi.Domain.Interfaces;
 
-public interface IRepository<T> where T : BaseEntity
+/// <summary>
+/// Interface base para repositórios - requer que T herde de GlobalEntity
+/// </summary>
+public interface IRepository<T> where T : GlobalEntity
 {
     Task<T?> GetByIdAsync(int id);
     Task<IEnumerable<T>> GetAllAsync();
@@ -12,3 +14,4 @@ public interface IRepository<T> where T : BaseEntity
     Task DeleteAsync(int id);
     Task<bool> ExistsAsync(int id);
 }
+
