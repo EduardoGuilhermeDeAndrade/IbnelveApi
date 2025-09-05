@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Entidade base para dados específicos do usuário
-/// (ex: tarefas pessoais, notas, lembretes, etc.)
+/// (ex: tarefas membrois, notas, lembretes, etc.)
 /// Possui TenantId E UserId
 /// </summary>
 public abstract class UserOwnedEntity : TenantEntity

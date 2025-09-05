@@ -12,7 +12,7 @@ namespace IbnelveApi.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Pessoas",
+                name: "Membros",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -32,7 +32,7 @@ namespace IbnelveApi.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Pessoas", x => x.Id);
+                    table.PrimaryKey("PK_Membros", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -206,18 +206,18 @@ namespace IbnelveApi.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pessoas_IsDeleted",
-                table: "Pessoas",
+                name: "IX_Membros_IsDeleted",
+                table: "Membros",
                 column: "IsDeleted");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pessoas_TenantId",
-                table: "Pessoas",
+                name: "IX_Membros_TenantId",
+                table: "Membros",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Pessoas_TenantId_CPF",
-                table: "Pessoas",
+                name: "IX_Membros_TenantId_CPF",
+                table: "Membros",
                 columns: new[] { "TenantId", "CPF" },
                 unique: true,
                 filter: "[IsDeleted] = 0");
@@ -306,7 +306,7 @@ namespace IbnelveApi.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Pessoas");
+                name: "Membros");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");

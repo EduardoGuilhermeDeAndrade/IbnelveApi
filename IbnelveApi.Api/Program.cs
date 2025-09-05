@@ -1,7 +1,4 @@
-using FluentValidation;
-using FluentValidation.AspNetCore;
 using IbnelveApi.Api.middlewares;
-using IbnelveApi.Application.Validators.Pessoa;
 using IbnelveApi.Infrastructure.Data;
 using IbnelveApi.IoC;
 using Microsoft.AspNetCore.Identity;
@@ -13,17 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Adiciona FluentValidation e registra os validators
 builder.Services
     .AddControllers();
-//    .AddFluentValidation(fv =>
-//    {
-//        fv.RegisterValidatorsFromAssemblyContaining<CreatePessoaDtoValidator>();
-//    });
-
-//builder.Services.AddControllers()
-//    .ConfigureApiBehaviorOptions(options =>
-//    {
-//        // Desativa o filtro que executa a validação automática
-//        options.SuppressModelStateInvalidFilter = true;
-//    });
 
 // Add all dependencies (Infrastructure, Application, Repositories)
 builder.Services.AddAllDependencies(builder.Configuration);

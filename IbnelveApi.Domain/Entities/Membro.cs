@@ -2,30 +2,22 @@ using IbnelveApi.Domain.ValueObjects;
 
 namespace IbnelveApi.Domain.Entities;
 
-public class Pessoa : BaseEntity
+public class Membro : TenantEntity
 {
     public string Nome { get; set; } = string.Empty;
     public string CPF { get; set; } = string.Empty;
     public string Telefone { get; set; } = string.Empty;
     public Endereco Endereco { get; set; } = null!;
 
-    public Pessoa() { }
+    public Membro() { }
 
-    public Pessoa(string nome, string cpf, string telefone, Endereco endereco)
+    public Membro(string nome, string cpf, string telefone, Endereco endereco, string tenantId)
     {
         Nome = nome;
         CPF = cpf;
         Telefone = telefone;
         Endereco = endereco;
-    }
-
-    public Pessoa(string nome, string cpf, string telefone, Endereco endereco, string tenantId)
-    {
-        Nome = nome;
-        CPF = cpf;
-        Telefone = telefone;
-        Endereco = endereco;
-        TenantId = tenantId;
+        TenantId = tenantId;  // TenantId obrigatório
     }
 
     public void AtualizarDados(string nome, string cpf, string telefone, Endereco endereco)
@@ -37,10 +29,5 @@ public class Pessoa : BaseEntity
         UpdatedAt = DateTime.UtcNow;
     }
 
-    //public void ExcluirLogicamente()
-    //{
-    //    IsDeleted = true;
-    //    UpdatedAt = DateTime.UtcNow;
-    //}
 }
 

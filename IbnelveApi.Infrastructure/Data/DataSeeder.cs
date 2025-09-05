@@ -13,11 +13,11 @@ public static class DataSeeder
         //Seed de usuários admin
         await SeedUsersAsync(userManager, context);
 
-        // Seed de pessoas
-        //await SeedPessoasAsync(context);
+        // Seed de membros
+        await SeedMembrosAsync(context);
 
         // Seed de tarefas
-        //await SeedTarefasAsync(context);
+        await SeedTarefasAsync(context);
     }
 
     private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager, ApplicationDbContext context)
@@ -63,134 +63,141 @@ public static class DataSeeder
             }
         }
     }
-    //Colocar o ignore query filter, pois filtra e acha que não tem registros e tenta colocar novamente.
-    //private static async Task SeedPessoasAsync(ApplicationDbContext context)
-    //{
-    //    if (!await context.Pessoas.IgnoreQueryFilters().AnyAsync())
-    //    {
-    //        var pessoas = new List<Pessoa>
-    //        {
-    //            new Pessoa(
-    //                "João Silva Santos",
-    //                "12345678901",
-    //                "(11) 99999-1111",
-    //                new Endereco(
-    //                    "Rua das Flores, 123",
-    //                    "01234567",
-    //                    "Centro",
-    //                    "São Paulo",
-    //                    "SP"
-    //                ),
-    //                "tenant1"
-    //            ),
-    //            new Pessoa(
-    //                "Maria Oliveira Costa",
-    //                "98765432109",
-    //                "(21) 88888-2222",
-    //                new Endereco(
-    //                    "Avenida Atlântica, 456",
-    //                    "22070900",
-    //                    "Copacabana",
-    //                    "Rio de Janeiro",
-    //                    "RJ"
-    //                ),
-    //                "tenant2"
-    //            )
-    //        };
 
-    //        await context.Pessoas.AddRangeAsync(pessoas);
-    //        await context.SaveChangesAsync();
-    //    }
-    //}
+    private static async Task SeedMembrosAsync(ApplicationDbContext context)
+    {
+        if (!await context.Membros.IgnoreQueryFilters().AnyAsync())
+        {
+            var membros = new List<Membro>
+            {
+                new Membro(
+                    "João Silva Santos",
+                    "12345678901",
+                    "(11) 99999-1111",
+                    new Endereco(
+                        "Rua das Flores, 123",
+                        "01234567",
+                        "Centro",
+                        "São Paulo",
+                        "SP"
+                    ),
+                    "tenant1"
+                ),
+                new Membro(
+                    "Maria Oliveira Costa",
+                    "98765432109",
+                    "(21) 88888-2222",
+                    new Endereco(
+                        "Avenida Atlântica, 456",
+                        "22070900",
+                        "Copacabana",
+                        "Rio de Janeiro",
+                        "RJ"
+                    ),
+                    "tenant2"
+                )
+            };
 
-    //private static async Task SeedTarefasAsync(ApplicationDbContext context)
-    //{
-    //    if (!await context.Tarefas.IgnoreQueryFilters().AnyAsync())
-    //    {
-    //        var tarefas = new List<Tarefa>
-    //        {
-    //            // Tarefas para tenant1
-    //            new Tarefa(
-    //                "Implementar autenticação JWT",
-    //                "Configurar sistema de autenticação usando JWT Bearer tokens para a API",
-    //                "tenant1",
-    //                ""
-    //                PrioridadeTarefa.Alta,
-    //                DateTime.UtcNow.AddDays(7),
-    //                "Desenvolvimento"
-    //            ),
-    //            new Tarefa(
-    //                "Criar documentação da API",
-    //                "Documentar todos os endpoints da API usando Swagger/OpenAPI",
-    //                "tenant1",
-    //                PrioridadeTarefa.Media,
-    //                DateTime.UtcNow.AddDays(14),
-    //                "Documentação"
-    //            ),
-    //            new Tarefa(
-    //                "Configurar CI/CD",
-    //                "Implementar pipeline de integração e deploy contínuo",
-    //                "tenant1",
-    //                PrioridadeTarefa.Baixa,
-    //                DateTime.UtcNow.AddDays(21),
-    //                "DevOps"
-    //            ),
-    //            new Tarefa(
-    //                "Revisar código da API",
-    //                "Fazer code review dos endpoints implementados",
-    //                "tenant1",
-    //                PrioridadeTarefa.Media,
-    //                DateTime.UtcNow.AddDays(-2), // Vencida
-    //                "Qualidade"
-    //            ),
+            await context.Membros.AddRangeAsync(membros);
+            await context.SaveChangesAsync();
+        }
+    }
 
-    //            // Tarefas para tenant2
-    //            new Tarefa(
-    //                "Implementar sistema de tarefas",
-    //                "Criar CRUD completo para gestão de tarefas com filtros avançados",
-    //                "tenant2",
-    //                PrioridadeTarefa.Critica,
-    //                DateTime.UtcNow.AddDays(3),
-    //                "Desenvolvimento"
-    //            ),
-    //            new Tarefa(
-    //                "Testes unitários",
-    //                "Implementar testes unitários para todos os serviços",
-    //                "tenant2",
-    //                PrioridadeTarefa.Alta,
-    //                DateTime.UtcNow.AddDays(10),
-    //                "Testes"
-    //            ),
-    //            new Tarefa(
-    //                "Otimizar consultas do banco",
-    //                "Analisar e otimizar queries do Entity Framework",
-    //                "tenant2",
-    //                PrioridadeTarefa.Media,
-    //                DateTime.UtcNow.AddDays(15),
-    //                "Performance"
-    //            ),
-    //            new Tarefa(
-    //                "Backup do banco de dados",
-    //                "Configurar rotina de backup automático",
-    //                "tenant2",
-    //                PrioridadeTarefa.Baixa,
-    //                DateTime.UtcNow.AddDays(30),
-    //                "Infraestrutura"
-    //            )
-    //        };
+    private static async Task SeedTarefasAsync(ApplicationDbContext context)
+    {
+        if (!await context.Tarefas.IgnoreQueryFilters().AnyAsync())
+        {
+            var tarefas = new List<Tarefa>
+            {
+                // Tarefas para tenant1, alterar o id do usuario conforme necessário
+                new Tarefa(
+                    "Implementar autenticação JWT",
+                    "Configurar sistema de autenticação usando JWT Bearer tokens para a API",
+                    "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
+                    "tenant1",
+                    PrioridadeTarefa.Alta,
+                    DateTime.UtcNow.AddDays(7),
+                    "Desenvolvimento"
+                ),
+                new Tarefa(
+                    "Criar documentação da API",
+                    "Documentar todos os endpoints da API usando Swagger/OpenAPI",
+                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
+                    "tenant1",
+                    PrioridadeTarefa.Media,
+                    DateTime.UtcNow.AddDays(14),
+                    "Documentação"
+                ),
+                new Tarefa(
+                    "Configurar CI/CD",
+                    "Implementar pipeline de integração e deploy contínuo",
+                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
+                    "tenant1",
+                    PrioridadeTarefa.Baixa,
+                    DateTime.UtcNow.AddDays(21),
+                    "DevOps"
+                ),
+                new Tarefa(
+                    "Revisar código da API",
+                    "Fazer code review dos endpoints implementados",
+                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
+                    "tenant1",
+                    PrioridadeTarefa.Media,
+                    DateTime.UtcNow.AddDays(-2), // Vencida
+                    "Qualidade"
+                ),
 
-    //        // Marcar algumas tarefas como concluídas
-    //        tarefas[1].MarcarComoConcluida(); // Documentação da API
-    //        tarefas[5].MarcarComoConcluida(); // Testes unitários
+                // Tarefas para tenant2
+                new Tarefa(
+                    "Implementar sistema de tarefas",
+                    "Criar CRUD completo para gestão de tarefas com filtros avançados",
+                     "d39740e2-a94d-482b-9f32-751058592e1c",
+                    "tenant2",
+                    PrioridadeTarefa.Critica,
+                    DateTime.UtcNow.AddDays(3),
+                    "Desenvolvimento"
+                ),
+                new Tarefa(
+                    "Testes unitários",
+                    "Implementar testes unitários para todos os serviços",
+                     "d39740e2-a94d-482b-9f32-751058592e1c",
+                    "tenant2",
+                    PrioridadeTarefa.Alta,
+                    DateTime.UtcNow.AddDays(10),
+                    "Testes"
+                ),
+                new Tarefa(
+                    "Otimizar consultas do banco",
+                    "Analisar e otimizar queries do Entity Framework",
+                     "d39740e2-a94d-482b-9f32-751058592e1c",
+                    "tenant2",
+                    PrioridadeTarefa.Media,
+                    DateTime.UtcNow.AddDays(15),
+                    "Performance"
+                ),
+                new Tarefa(
+                    "Backup do banco de dados",
+                    "Configurar rotina de backup automático",
+                     "d39740e2-a94d-482b-9f32-751058592e1c",
+                    "tenant2",
+                    PrioridadeTarefa.Baixa,
+                    DateTime.UtcNow.AddDays(30),
+                    "Infraestrutura"
+                )
+            };
 
-    //        // Marcar algumas como em andamento
-    //        tarefas[0].MarcarComoEmAndamento(); // Autenticação JWT
-    //        tarefas[4].MarcarComoEmAndamento(); // Sistema de tarefas
+            // Marcar algumas tarefas como concluídas
+            tarefas[1].MarcarComoConcluida(); // Documentação da API
+            tarefas[5].MarcarComoConcluida(); // Testes unitários
 
-    //        await context.Tarefas.AddRangeAsync(tarefas);
-    //        await context.SaveChangesAsync();
-    //    }
-    //}
+            // Marcar algumas como em andamento
+            tarefas[0].MarcarComoEmAndamento(); // Autenticação JWT
+            tarefas[4].MarcarComoEmAndamento(); // Sistema de tarefas
+
+            await context.Tarefas.AddRangeAsync(tarefas);
+            await context.SaveChangesAsync();
+        }
+    }
 
 
 }

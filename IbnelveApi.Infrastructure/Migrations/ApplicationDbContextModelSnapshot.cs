@@ -22,7 +22,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("IbnelveApi.Domain.Entities.Pessoa", b =>
+            modelBuilder.Entity("IbnelveApi.Domain.Entities.Membro", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -71,7 +71,7 @@ namespace IbnelveApi.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.ToTable("Pessoas", (string)null);
+                    b.ToTable("Membros", (string)null);
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Tarefa", b =>
@@ -355,11 +355,11 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("IbnelveApi.Domain.Entities.Pessoa", b =>
+            modelBuilder.Entity("IbnelveApi.Domain.Entities.Membro", b =>
                 {
                     b.OwnsOne("IbnelveApi.Domain.ValueObjects.Endereco", "Endereco", b1 =>
                         {
-                            b1.Property<int>("PessoaId")
+                            b1.Property<int>("MembroId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("Bairro")
@@ -392,12 +392,12 @@ namespace IbnelveApi.Infrastructure.Migrations
                                 .HasColumnType("nvarchar(2)")
                                 .HasColumnName("EnderecoUF");
 
-                            b1.HasKey("PessoaId");
+                            b1.HasKey("MembroId");
 
-                            b1.ToTable("Pessoas");
+                            b1.ToTable("Membros");
 
                             b1.WithOwner()
-                                .HasForeignKey("PessoaId");
+                                .HasForeignKey("MembroId");
                         });
 
                     b.Navigation("Endereco")

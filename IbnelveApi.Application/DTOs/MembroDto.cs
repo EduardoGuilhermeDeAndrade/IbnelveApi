@@ -1,6 +1,6 @@
 namespace IbnelveApi.Application.DTOs;
 
-public class PessoaDto
+public class MembroDto
 {
     public int Id { get; set; }
     public string Nome { get; set; } = string.Empty;
@@ -11,7 +11,7 @@ public class PessoaDto
     public DateTime? UpdatedAt { get; set; }
 }
 
-public class CreatePessoaDto
+public class CreateMembroDto
 {
     public string Nome { get; set; } = string.Empty;
     public string CPF { get; set; } = string.Empty;
@@ -19,7 +19,7 @@ public class CreatePessoaDto
     public EnderecoDto Endereco { get; set; } = new();
 }
 
-public class UpdatePessoaDto
+public class UpdateMembroDto
 {
     public string Nome { get; set; } = string.Empty;
     public string CPF { get; set; } = string.Empty;

@@ -1,30 +1,28 @@
 using IbnelveApi.Domain.Entities;
-using IbnelveApi.Domain.Extensions;
-using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Security.Claims;
 
 namespace IbnelveApi.Infrastructure.Data;
 
+/// <summary>
+/// ApplicationDbContext
+/// LIMPO: Removido código comentado e simplificado filtros globais
+/// </summary>
 public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 {
-    //private readonly ITenantContext _tenantContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options,  IHttpContextAccessor httpContextAccessor/*ITenantContext tenantContext*/)
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpContextAccessor)
         : base(options)
     {
-        //_tenantContext = tenantContext;
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public DbSet<Pessoa> Pessoas { get; set; }
+    public DbSet<Membro> Membros { get; set; }
     public DbSet<Tarefa> Tarefas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,64 +30,34 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         base.OnModelCreating(modelBuilder);
 
         // Aplicar configurações
-        modelBuilder.ApplyConfiguration(new PessoaConfiguration());
+        modelBuilder.ApplyConfiguration(new MembroConfiguration());
         modelBuilder.ApplyConfiguration(new TarefaConfiguration());
 
-        // Configurar filtros globais para todas as entidades que herdam de BaseEntity
+        // Configurar filtros globais
         ConfigureGlobalFilters(modelBuilder);
 
-        // Configurar Identity tables para incluir TenantId
+        // Configurar Identity tables
         ConfigureIdentityTables(modelBuilder);
     }
 
     private void ConfigureGlobalFilters(ModelBuilder modelBuilder)
     {
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-            {
-                var method = typeof(ApplicationDbContext)
-                    .GetMethod(nameof(SetGlobalQueryFilter), BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.MakeGenericMethod(entityType.ClrType);
+        // ✅ SIMPLIFICADO: Filtros globais mais diretos
 
-                method?.Invoke(this, new object[] { modelBuilder });
-            }
-        }
-    }
-
-    //private void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder)
-    //    where T : BaseEntity
-    //{
-    //    modelBuilder.Entity<T>().HasQueryFilter(e =>
-    //        !e.IsDeleted &&
-    //        GetCurrentTenantId() != null &&
-    //        e.TenantId == GetCurrentTenantId()) 
-    //        ;
-    //}
-    private void SetGlobalQueryFilter<T>(ModelBuilder modelBuilder) where T : BaseEntity
-    {
-        var tenantId = GetCurrentTenantId();
-        var userId = GetCurrentUserId();
-
-        // Tenant obrigatório sempre
-        Expression<Func<T, bool>> filter = e =>
+        // Filtro para TenantEntity (como Membro) - apenas TenantId
+        modelBuilder.Entity<Membro>().HasQueryFilter(e =>
             !e.IsDeleted &&
-            tenantId != null &&
-            e.TenantId == tenantId;
+            GetCurrentTenantId() != null &&
+            e.TenantId == GetCurrentTenantId());
 
-        // Se a entidade também for "user-scoped", aplicar filtro adicional
-        if (typeof(IUserScopedEntity).IsAssignableFrom(typeof(T)))
-        {
-            Expression<Func<T, bool>> userFilter = e =>
-                ((IUserScopedEntity)e).UserId == userId;
-
-            // Combina com AND lógico
-            filter = filter.And(userFilter);
-        }
-
-        modelBuilder.Entity<T>().HasQueryFilter(filter);
+        // Filtro para UserOwnedEntity (como Tarefa) - TenantId + UserId
+        modelBuilder.Entity<Tarefa>().HasQueryFilter(e =>
+            !e.IsDeleted &&
+            GetCurrentTenantId() != null &&
+            e.TenantId == GetCurrentTenantId() &&
+            GetCurrentUserId() != null &&
+            e.UserId == GetCurrentUserId());
     }
-
 
     private string? GetCurrentTenantId()
     {
@@ -97,16 +65,15 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         if (httpContext?.User?.Identity?.IsAuthenticated == true)
         {
-            var tenantClaim = httpContext.User.FindFirst("TenantId")
-                             ?? httpContext.User.FindFirst("Tenant_id")
-                             ?? httpContext.User.FindFirst(ClaimTypes.GroupSid);
+            var tenantClaim = httpContext.User.FindFirst("TenantId") ??
+                             httpContext.User.FindFirst("Tenant_id") ??
+                             httpContext.User.FindFirst(ClaimTypes.GroupSid);
 
-            return tenantClaim?.Value; // só acessa Value se não for null
+            return tenantClaim?.Value;
         }
 
         return null;
     }
-
 
     private string? GetCurrentUserId()
     {
@@ -123,10 +90,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         return null;
     }
 
-
     private void ConfigureIdentityTables(ModelBuilder modelBuilder)
     {
-        //Todo: Verificar se é necessário criar uma classe customizada para IdentityUser e IdentityRole para incluir TenantId diretamente
         // Adicionar TenantId às tabelas do Identity
         modelBuilder.Entity<IdentityUser>().Property<string>("TenantId").HasMaxLength(450);
         modelBuilder.Entity<IdentityUser>().HasIndex("TenantId");
@@ -143,13 +108,14 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Atualizar timestamps automaticamente
-        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        // Atualizar timestamps e TenantId automaticamente
+        foreach (var entry in ChangeTracker.Entries<TenantEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAt = DateTime.UtcNow;
+
                     // Definir TenantId automaticamente se não estiver definido
                     if (string.IsNullOrEmpty(entry.Entity.TenantId))
                     {
@@ -160,6 +126,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                         }
                     }
                     break;
+
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = DateTime.UtcNow;
                     // Garantir que o TenantId não seja alterado em updates
@@ -168,11 +135,45 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             }
         }
 
+        // Atualizar timestamps e UserId para UserOwnedEntity
+        foreach (var entry in ChangeTracker.Entries<UserOwnedEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+
+                    // Definir TenantId automaticamente se não estiver definido
+                    if (string.IsNullOrEmpty(entry.Entity.TenantId))
+                    {
+                        var currentTenantId = GetCurrentTenantId();
+                        if (!string.IsNullOrEmpty(currentTenantId))
+                        {
+                            entry.Entity.TenantId = currentTenantId;
+                        }
+                    }
+
+                    // Definir UserId automaticamente se não estiver definido
+                    if (string.IsNullOrEmpty(entry.Entity.UserId))
+                    {
+                        var currentUserId = GetCurrentUserId();
+                        if (!string.IsNullOrEmpty(currentUserId))
+                        {
+                            entry.Entity.UserId = currentUserId;
+                        }
+                    }
+                    break;
+
+                case EntityState.Modified:
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                    // Garantir que TenantId e UserId não sejam alterados em updates
+                    entry.Property(e => e.TenantId).IsModified = false;
+                    entry.Property(e => e.UserId).IsModified = false;
+                    break;
+            }
+        }
+
         return await base.SaveChangesAsync(cancellationToken);
     }
-
-    
 }
-
-
 

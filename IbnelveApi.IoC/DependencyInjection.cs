@@ -11,7 +11,7 @@ using IbnelveApi.Application.Services;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
 using IbnelveApi.Infrastructure.Repositories;
-using IbnelveApi.Application.Validators.Pessoa;
+using IbnelveApi.Application.Validators.Membro;
 
 namespace IbnelveApi.IoC;
 
@@ -28,7 +28,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         // ===== APPLICATION SERVICES =====
-        services.AddScoped<IPessoaService, PessoaService>();
+        services.AddScoped<IMembroService, MembroService>();
         services.AddScoped<ITarefaService, TarefaService>();
 
         //  ADICIONADO: Serviço para capturar contexto do usuário atual
@@ -38,7 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         // ===== VALIDATION =====
-        services.AddValidatorsFromAssemblyContaining<CreatePessoaDtoValidator>();
+        services.AddValidatorsFromAssemblyContaining<CreateMembroDtoValidator>();
 
         // ===== REPOSITORIES =====
 
@@ -52,7 +52,7 @@ public static class DependencyInjection
         services.AddScoped(typeof(IUserOwnedRepository<>), typeof(UserOwnedRepository<>));
 
         // Repositórios específicos existentes
-        services.AddScoped<IPessoaRepository, PessoaRepository>();
+        services.AddScoped<IMembroRepository, MembroRepository>();
         services.AddScoped<ITarefaRepository, TarefaRepository>();
 
         return services;

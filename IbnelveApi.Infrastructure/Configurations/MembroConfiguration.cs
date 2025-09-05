@@ -5,11 +5,11 @@ using IbnelveApi.Domain.ValueObjects;
 
 namespace IbnelveApi.Infrastructure.Configurations;
 
-public class PessoaConfiguration : IEntityTypeConfiguration<Pessoa>
+public class MembroConfiguration : IEntityTypeConfiguration<Membro>
 {
-    public void Configure(EntityTypeBuilder<Pessoa> builder)
+    public void Configure(EntityTypeBuilder<Membro> builder)
     {
-        builder.ToTable("Pessoas");
+        builder.ToTable("Membros");
 
         builder.HasKey(p => p.Id);
 
