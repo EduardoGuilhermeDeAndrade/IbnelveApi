@@ -38,8 +38,6 @@ public class TarefaConfiguration : IEntityTypeConfiguration<Tarefa>
 
         builder.Property(t => t.DataConclusao);
 
-        builder.Property(t => t.Categoria)
-            .HasMaxLength(100);
 
         builder.Property(t => t.TenantId)
             .IsRequired()
@@ -57,11 +55,18 @@ public class TarefaConfiguration : IEntityTypeConfiguration<Tarefa>
         // Índices
         builder.HasIndex(t => new { t.TenantId, t.Status });
         builder.HasIndex(t => new { t.TenantId, t.Prioridade });
-        builder.HasIndex(t => new { t.TenantId, t.Categoria });
         builder.HasIndex(t => new { t.TenantId, t.DataVencimento });
         builder.HasIndex(t => t.TenantId);
         builder.HasIndex(t => t.IsDeleted);
         builder.HasIndex(t => t.CreatedAt);
+
+        // ADICIONAR:
+        builder.HasOne(e => e.Categoria)
+            .WithMany(e => e.Tarefas)
+            .HasForeignKey(e => e.CategoriaId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(e => e.CategoriaId);
     }
 }
 

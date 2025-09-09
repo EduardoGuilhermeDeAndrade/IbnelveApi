@@ -1,3 +1,12 @@
+using FluentValidation;
+using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.Interfaces;
+using IbnelveApi.Application.Services;
+using IbnelveApi.Application.Validators.CategoriaTarefa;
+using IbnelveApi.Application.Validators.Membro;
+using IbnelveApi.Domain.Interfaces;
+using IbnelveApi.Infrastructure.Data;
+using IbnelveApi.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -5,13 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using FluentValidation;
-using IbnelveApi.Application.Interfaces;
-using IbnelveApi.Application.Services;
-using IbnelveApi.Domain.Interfaces;
-using IbnelveApi.Infrastructure.Data;
-using IbnelveApi.Infrastructure.Repositories;
-using IbnelveApi.Application.Validators.Membro;
 
 namespace IbnelveApi.IoC;
 
@@ -30,6 +32,7 @@ public static class DependencyInjection
         // ===== APPLICATION SERVICES =====
         services.AddScoped<IMembroService, MembroService>();
         services.AddScoped<ITarefaService, TarefaService>();
+        services.AddScoped<ICategoriaTarefaService, CategoriaTarefaService>();
 
         //  ADICIONADO: Serviço para capturar contexto do usuário atual
         services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -39,6 +42,7 @@ public static class DependencyInjection
 
         // ===== VALIDATION =====
         services.AddValidatorsFromAssemblyContaining<CreateMembroDtoValidator>();
+        //Não necessário registrar todos, pois o FluentValidation já faz isso automaticamente
 
         // ===== REPOSITORIES =====
 
@@ -54,6 +58,7 @@ public static class DependencyInjection
         // Repositórios específicos existentes
         services.AddScoped<IMembroRepository, MembroRepository>();
         services.AddScoped<ITarefaRepository, TarefaRepository>();
+        services.AddScoped<ICategoriaTarefaRepository, CategoriaTarefaRepository>();
 
         return services;
     }

@@ -16,7 +16,7 @@ public class TarefaRepository : UserOwnedRepository<Tarefa>, ITarefaRepository
     {
     }
 
-    // ✅ Os métodos GetByIdAsync, GetAllAsync e GetByUserAsync já são herdados da classe base
+    // Os métodos GetByIdAsync, GetAllAsync e GetByUserAsync já são herdados da classe base
     // e aplicam automaticamente os filtros por UserId E TenantId
 
     public async Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status, string userId, string tenantId, bool includeDeleted = false)
@@ -35,10 +35,10 @@ public class TarefaRepository : UserOwnedRepository<Tarefa>, ITarefaRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Tarefa>> GetByCategoriaAsync(string categoria, string userId, string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<Tarefa>> GetByCategoriaAsync(int? categoriaId, string userId, string tenantId, bool includeDeleted = false)
     {
         return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
-            .Where(t => t.Categoria == categoria)
+            .Where(t => t.CategoriaId == categoriaId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
@@ -70,7 +70,7 @@ public class TarefaRepository : UserOwnedRepository<Tarefa>, ITarefaRepository
         return await ApplyUserAndTenantFilter(userId, tenantId, includeDeleted)
             .Where(t => t.Titulo.ToLower().Contains(termLower) ||
                        t.Descricao.ToLower().Contains(termLower) ||
-                       (t.Categoria != null && t.Categoria.ToLower().Contains(termLower)))
+                       (t.CategoriaId != 0))
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
@@ -80,7 +80,7 @@ public class TarefaRepository : UserOwnedRepository<Tarefa>, ITarefaRepository
         string tenantId,
         StatusTarefa? status = null,
         PrioridadeTarefa? prioridade = null,
-        string? categoria = null,
+        int? categoriaId = null,
         DateTime? dataVencimentoInicio = null,
         DateTime? dataVencimentoFim = null,
         bool includeDeleted = false,
@@ -95,8 +95,8 @@ public class TarefaRepository : UserOwnedRepository<Tarefa>, ITarefaRepository
         if (prioridade.HasValue)
             query = query.Where(t => t.Prioridade == prioridade.Value);
 
-        if (!string.IsNullOrEmpty(categoria))
-            query = query.Where(t => t.Categoria == categoria);
+        if (categoriaId != 0)
+            query = query.Where(t => t.CategoriaId == categoriaId);
 
         if (dataVencimentoInicio.HasValue)
             query = query.Where(t => t.DataVencimento >= dataVencimentoInicio.Value);

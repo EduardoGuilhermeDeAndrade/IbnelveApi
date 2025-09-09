@@ -19,38 +19,39 @@ public static class TarefaMapping
             PrioridadeDescricao = GetPrioridadeDescricao(tarefa.Prioridade),
             DataVencimento = tarefa.DataVencimento,
             DataConclusao = tarefa.DataConclusao,
-            Categoria = tarefa.Categoria,
             TenantId = tarefa.TenantId,
             CreatedAt = tarefa.CreatedAt,
             UpdatedAt = tarefa.UpdatedAt,
             EstaVencida = tarefa.EstaVencida(),
             EstaConcluida = tarefa.EstaConcluida(),
-            
+            CategoriaId = tarefa.CategoriaId,
+            Categoria = tarefa.Categoria?.ToSelectDto(),
+
         };
     }
 
     public static Tarefa ToEntity(CreateTarefaDto createDto, string tenantId, string userId)
     {
         return new Tarefa(
-            createDto.Titulo,
-            createDto.Descricao,
+    createDto.Titulo,
+    createDto.Descricao,
+    createDto.Prioridade,
+    createDto.DataVencimento,
+    createDto.CategoriaId, 
             tenantId,
-            userId,
-            createDto.Prioridade,
-            createDto.DataVencimento,
-            createDto.Categoria            
-        );
+            userId
+);
     }
 
     public static void UpdateEntity(Tarefa tarefa, UpdateTarefaDto updateDto)
     {
         tarefa.AtualizarDados(
-            updateDto.Titulo,
-            updateDto.Descricao,
-            updateDto.Prioridade,
-            updateDto.DataVencimento,
-            updateDto.Categoria
-        );
+    updateDto.Titulo,
+    updateDto.Descricao,
+    updateDto.Prioridade,
+    updateDto.DataVencimento,
+    updateDto.CategoriaId 
+);
     }
 
     public static IEnumerable<TarefaDto> ToDtoList(IEnumerable<Tarefa> tarefas)

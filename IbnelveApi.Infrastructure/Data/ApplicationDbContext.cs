@@ -24,6 +24,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<Membro> Membros { get; set; }
     public DbSet<Tarefa> Tarefas { get; set; }
+    public DbSet<CategoriaTarefa> CategoriaTarefas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

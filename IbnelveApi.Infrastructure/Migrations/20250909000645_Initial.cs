@@ -12,6 +12,26 @@ namespace IbnelveApi.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "CategoriaTarefas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Cor = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoriaTarefas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Membros",
                 columns: table => new
                 {
@@ -50,30 +70,6 @@ namespace IbnelveApi.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tarefas",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Titulo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Descricao = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
-                    Prioridade = table.Column<int>(type: "int", nullable: false, defaultValue: 2),
-                    DataVencimento = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DataConclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Categoria = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TenantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tarefas", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -97,6 +93,36 @@ namespace IbnelveApi.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tarefas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Titulo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
+                    Prioridade = table.Column<int>(type: "int", nullable: false, defaultValue: 2),
+                    DataVencimento = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DataConclusao = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CategoriaId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tarefas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tarefas_CategoriaTarefas_CategoriaId",
+                        column: x => x.CategoriaId,
+                        principalTable: "CategoriaTarefas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -235,6 +261,11 @@ namespace IbnelveApi.Infrastructure.Migrations
                 filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tarefas_CategoriaId",
+                table: "Tarefas",
+                column: "CategoriaId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tarefas_CreatedAt",
                 table: "Tarefas",
                 column: "CreatedAt");
@@ -248,11 +279,6 @@ namespace IbnelveApi.Infrastructure.Migrations
                 name: "IX_Tarefas_TenantId",
                 table: "Tarefas",
                 column: "TenantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Tarefas_TenantId_Categoria",
-                table: "Tarefas",
-                columns: new[] { "TenantId", "Categoria" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tarefas_TenantId_DataVencimento",
@@ -325,6 +351,9 @@ namespace IbnelveApi.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserTokens");
+
+            migrationBuilder.DropTable(
+                name: "CategoriaTarefas");
 
             migrationBuilder.DropTable(
                 name: "Roles");

@@ -13,11 +13,15 @@ public static class DataSeeder
         //Seed de usuários admin
         await SeedUsersAsync(userManager, context);
 
-        // Seed de membros
+        // Seed de Membros
         await SeedMembrosAsync(context);
+
+        // Seed de categoriaTarefas
+        await SeedCategoriaTarefas(context);
 
         // Seed de tarefas
         await SeedTarefasAsync(context);
+        
     }
 
     private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager, ApplicationDbContext context)
@@ -113,76 +117,76 @@ public static class DataSeeder
                 new Tarefa(
                     "Implementar autenticação JWT",
                     "Configurar sistema de autenticação usando JWT Bearer tokens para a API",
-                    "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
-                    "tenant1",
                     PrioridadeTarefa.Alta,
                     DateTime.UtcNow.AddDays(7),
-                    "Desenvolvimento"
+                    1,
+                    "tenant1",
+                    "3159add8-ac6b-4e76-8d8b-69a4864b19ff"
                 ),
                 new Tarefa(
                     "Criar documentação da API",
                     "Documentar todos os endpoints da API usando Swagger/OpenAPI",
-                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
-                    "tenant1",
                     PrioridadeTarefa.Media,
                     DateTime.UtcNow.AddDays(14),
-                    "Documentação"
+                    1,
+                    "tenant1",
+                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff"
                 ),
                 new Tarefa(
                     "Configurar CI/CD",
                     "Implementar pipeline de integração e deploy contínuo",
-                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
-                    "tenant1",
                     PrioridadeTarefa.Baixa,
                     DateTime.UtcNow.AddDays(21),
-                    "DevOps"
+                    1,
+                    "tenant1",
+                    "3159add8-ac6b-4e76-8d8b-69a4864b19ff"
                 ),
                 new Tarefa(
                     "Revisar código da API",
                     "Fazer code review dos endpoints implementados",
-                     "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
-                    "tenant1",
                     PrioridadeTarefa.Media,
                     DateTime.UtcNow.AddDays(-2), // Vencida
-                    "Qualidade"
+                    1,
+                    "3159add8-ac6b-4e76-8d8b-69a4864b19ff",
+                    "tenant1"
                 ),
 
                 // Tarefas para tenant2
                 new Tarefa(
                     "Implementar sistema de tarefas",
                     "Criar CRUD completo para gestão de tarefas com filtros avançados",
-                     "d39740e2-a94d-482b-9f32-751058592e1c",
-                    "tenant2",
                     PrioridadeTarefa.Critica,
                     DateTime.UtcNow.AddDays(3),
-                    "Desenvolvimento"
-                ),
+                    1,
+                    "tenant2",
+                    "d39740e2-a94d-482b-9f32-751058592e1c"
+                     ),
                 new Tarefa(
                     "Testes unitários",
                     "Implementar testes unitários para todos os serviços",
-                     "d39740e2-a94d-482b-9f32-751058592e1c",
-                    "tenant2",
                     PrioridadeTarefa.Alta,
                     DateTime.UtcNow.AddDays(10),
-                    "Testes"
+                    1,
+                    "tenant2",
+                    "d39740e2-a94d-482b-9f32-751058592e1c"
                 ),
                 new Tarefa(
                     "Otimizar consultas do banco",
                     "Analisar e otimizar queries do Entity Framework",
-                     "d39740e2-a94d-482b-9f32-751058592e1c",
-                    "tenant2",
                     PrioridadeTarefa.Media,
                     DateTime.UtcNow.AddDays(15),
-                    "Performance"
+                    1,   
+                    "tenant2",  
+                    "d39740e2-a94d-482b-9f32-751058592e1c"
                 ),
                 new Tarefa(
                     "Backup do banco de dados",
                     "Configurar rotina de backup automático",
-                     "d39740e2-a94d-482b-9f32-751058592e1c",
-                    "tenant2",
                     PrioridadeTarefa.Baixa,
                     DateTime.UtcNow.AddDays(30),
-                    "Infraestrutura"
+                    1,
+                    "tenant2",
+                    "d39740e2-a94d-482b-9f32-751058592e1c"                
                 )
             };
 
@@ -199,6 +203,107 @@ public static class DataSeeder
         }
     }
 
+    private static async Task SeedCategoriaTarefas(ApplicationDbContext context)
+    {
+        if (!await context.CategoriaTarefas.IgnoreQueryFilters().AnyAsync())
+        {
+            var categoriaTarefas = new List<CategoriaTarefa>
+            {
+                new CategoriaTarefa
+                {
+                   // Id = 1,
+                    Nome = "Pessoal Estudos",
+                    Descricao = "Tarefas relacionadas a estudos pessoais",
+                    Cor = "#3B82F6", // Azul
+                    Ativa = true,
+                    TenantId = "tenant1",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
+                new CategoriaTarefa
+                {
+                    // Id = 2,
+                    Nome = "Casa Manutenção",
+                    Descricao = "Tarefas de manutenção da casa",
+                    Cor = "#10B981", // Verde
+                    Ativa = true,
+                    TenantId = "tenant1",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
+                new CategoriaTarefa
+                {
+                    // Id = 3,
+                    Nome = "Igreja Administração",
+                    Descricao = "Tarefas administrativas da igreja",
+                    Cor = "#8B5CF6", // Roxo
+                    Ativa = true,
+                    TenantId = "tenant1",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
+                new CategoriaTarefa
+                {
+                   //  Id = 4,
+                    Nome = "Igreja Manutenção",
+                    Descricao = "Tarefas de manutenção da igreja",
+                    Cor = "#F59E0B", // Amarelo
+                    Ativa = true,
+                    TenantId = "tenant1",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
+                new CategoriaTarefa
+                {
+                   //  Id = 5,
+                    Nome = "Veiculos",
+                    Descricao = "Tarefas relacionadas a veículos",
+                    Cor = "#EF4444", // Vermelho
+                    Ativa = true,
+                    TenantId = "tenant1",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
 
+                // Tenant 2
+                new CategoriaTarefa
+                {
+                  //   Id = 6,
+                    Nome = "Pessoal Estudos",
+                    Descricao = "Tarefas relacionadas a estudos pessoais",
+                    Cor = "#3B82F6", // Azul
+                    Ativa = true,
+                    TenantId = "tenant2",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
+                new CategoriaTarefa
+                {
+                   //  Id = 7,
+                    Nome = "Casa Manutenção",
+                    Descricao = "Tarefas de manutenção da casa",
+                    Cor = "#10B981", // Verde
+                    Ativa = true,
+                    TenantId = "tenant2",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                },
+                new CategoriaTarefa
+                {
+                   //  Id = 8,
+                    Nome = "Veiculos",
+                    Descricao = "Tarefas relacionadas a veículos",
+                    Cor = "#EF4444", // Vermelho
+                    Ativa = true,
+                    TenantId = "tenant2",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                }
+            };
+
+            await context.CategoriaTarefas.AddRangeAsync(categoriaTarefas);
+            await context.SaveChangesAsync();
+        }
+    }
 }
 

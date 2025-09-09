@@ -11,7 +11,7 @@ public interface ITarefaRepository : IUserOwnedRepository<Tarefa>
 {
     Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status, string userId, string tenantId, bool includeDeleted = false);
     Task<IEnumerable<Tarefa>> GetByPrioridadeAsync(PrioridadeTarefa prioridade, string userId, string tenantId, bool includeDeleted = false);
-    Task<IEnumerable<Tarefa>> GetByCategoriaAsync(string categoria, string userId, string tenantId, bool includeDeleted = false);
+    Task<IEnumerable<Tarefa>> GetByCategoriaAsync(int? categoriaId, string userId, string tenantId, bool includeDeleted = false);
     Task<IEnumerable<Tarefa>> GetVencidasAsync(string userId, string tenantId, bool includeDeleted = false);
     Task<IEnumerable<Tarefa>> GetConcluidasAsync(string userId, string tenantId, bool includeDeleted = false);
     Task<IEnumerable<Tarefa>> SearchAsync(string searchTerm, string userId, string tenantId, bool includeDeleted = false);
@@ -20,7 +20,7 @@ public interface ITarefaRepository : IUserOwnedRepository<Tarefa>
         string tenantId,
         StatusTarefa? status = null,
         PrioridadeTarefa? prioridade = null,
-        string? categoria = null,
+        int? categoriaId = 0,
         DateTime? dataVencimentoInicio = null,
         DateTime? dataVencimentoFim = null,
         bool includeDeleted = false,

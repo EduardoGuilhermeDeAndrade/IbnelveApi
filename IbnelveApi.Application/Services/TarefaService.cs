@@ -63,7 +63,7 @@ public class TarefaService : ITarefaService
                 tenantId,
                 filtro.Status,
                 filtro.Prioridade,
-                filtro.Categoria,
+                filtro.CategoriaId,
                 filtro.DataVencimentoInicio,
                 filtro.DataVencimentoFim,
                 filtro.IncludeDeleted,
@@ -97,14 +97,21 @@ public class TarefaService : ITarefaService
     {
         try
         {
-            var tarefa = new Tarefa(
-                createDto.Titulo,
-                createDto.Descricao,
-                userId,
-                tenantId,
-                createDto.Prioridade,
-                createDto.DataVencimento,
-                createDto.Categoria
+            var tarefa = new Tarefa( 
+                createDto.Titulo, 
+                createDto.Descricao, 
+                createDto.Prioridade, 
+                createDto.DataVencimento, 
+                createDto.CategoriaId, 
+                tenantId, userId
+
+            //createDto.Titulo,
+            //    createDto.Descricao,
+            //    createDto.CategoriaId,
+            //    userId,
+            //    tenantId,
+            //    createDto.Prioridade,
+            //    createDto.DataVencimento
             );
 
             var tarefaCriada = await _tarefaRepository.AddAsync(tarefa);
@@ -132,7 +139,7 @@ public class TarefaService : ITarefaService
                 updateDto.Descricao,
                 updateDto.Prioridade,
                 updateDto.DataVencimento,
-                updateDto.Categoria
+                updateDto.CategoriaId
             );
 
             var tarefaAtualizada = await _tarefaRepository.UpdateAsync(tarefa);

@@ -13,31 +13,32 @@ public class Tarefa : UserOwnedEntity
     public PrioridadeTarefa Prioridade { get; set; } = PrioridadeTarefa.Media;
     public DateTime? DataVencimento { get; set; }
     public DateTime? DataConclusao { get; set; }
-    public string? Categoria { get; set; }
+    //public string? Categoria { get; set; }
+    public int? CategoriaId { get; set; }
+    public virtual CategoriaTarefa? Categoria { get; set; }
 
     public Tarefa() { }
 
-    public Tarefa(string titulo, string descricao, string userId, string tenantId,
-                  PrioridadeTarefa prioridade = PrioridadeTarefa.Media,
-                  DateTime? dataVencimento = null, string? categoria = null)
+    public Tarefa(string titulo, string descricao, PrioridadeTarefa prioridade, DateTime? dataVencimento,
+              int? categoriaId, string tenantId, string userId)
     {
         Titulo = titulo;
         Descricao = descricao;
-        UserId = userId;        //  Específico do usuário
-        TenantId = tenantId;    //  Específico do tenant
         Prioridade = prioridade;
         DataVencimento = dataVencimento;
-        Categoria = categoria;
+        CategoriaId = categoriaId; // NOVA LINHA
+        TenantId = tenantId;
+        UserId = userId;
         Status = StatusTarefa.Pendente;
     }
 
-    public void AtualizarDados(string titulo, string descricao, PrioridadeTarefa prioridade, DateTime? dataVencimento = null, string? categoria = null)
+    public void AtualizarDados(string titulo, string descricao, PrioridadeTarefa prioridade, DateTime? dataVencimento, int? categoriaId)
     {
         Titulo = titulo;
         Descricao = descricao;
         Prioridade = prioridade;
         DataVencimento = dataVencimento;
-        Categoria = categoria;
+        CategoriaId = categoriaId; // NOVA LINHA
         UpdatedAt = DateTime.UtcNow;
     }
 

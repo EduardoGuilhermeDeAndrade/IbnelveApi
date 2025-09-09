@@ -20,7 +20,7 @@ public class CreateTarefaDtoValidator : AbstractValidator<CreateTarefaDto>
 
         RuleFor(x => x.Prioridade)
             .IsInEnum().WithMessage("Prioridade deve ser um valor válido")
-            .NotEqual(PrioridadeTarefa.Critica).When(x => string.IsNullOrEmpty(x.Categoria))
+            .NotEqual(PrioridadeTarefa.Critica).When(x => x.CategoriaId == 0)
             .WithMessage("Tarefas críticas devem ter uma categoria definida");
 
         RuleFor(x => x.DataVencimento)
@@ -28,9 +28,13 @@ public class CreateTarefaDtoValidator : AbstractValidator<CreateTarefaDto>
             .WithMessage("Data de vencimento não pode ser anterior a hoje")
             .When(x => x.DataVencimento.HasValue);
 
-        RuleFor(x => x.Categoria)
-            .MaximumLength(100).WithMessage("Categoria deve ter no máximo 100 caracteres")
-            .When(x => !string.IsNullOrEmpty(x.Categoria));
+        //RuleFor(x => x.Categoria)
+        //    .MaximumLength(100).WithMessage("Categoria deve ter no máximo 100 caracteres")
+        //    .When(x => !string.IsNullOrEmpty(x.Categoria));
+        RuleFor(x => x.CategoriaId)
+            .GreaterThan(0)
+            .WithMessage("Categoria deve ser um valor válido")
+            .When(x => x.CategoriaId.HasValue);
     }
 }
 

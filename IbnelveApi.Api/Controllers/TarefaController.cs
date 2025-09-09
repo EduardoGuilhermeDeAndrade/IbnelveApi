@@ -59,7 +59,7 @@ public class TarefaController : ControllerBase
     public async Task<ActionResult<ApiResponse<IEnumerable<TarefaDto>>>> GetWithFilters(
         [FromQuery] StatusTarefa? status = null,
         [FromQuery] PrioridadeTarefa? prioridade = null,
-        [FromQuery] string? categoria = null,
+        [FromQuery] int? categoriaId = 0,
         [FromQuery] DateTime? dataVencimentoInicio = null,
         [FromQuery] DateTime? dataVencimentoFim = null,
         [FromQuery] bool includeDeleted = false,
@@ -80,8 +80,8 @@ public class TarefaController : ControllerBase
             var filtro = new TarefaFiltroDto
             {
                 Status = status,
-                Prioridade = prioridade,
-                Categoria = categoria,
+                Prioridade = prioridade, 
+                CategoriaId = categoriaId,
                 DataVencimentoInicio = dataVencimentoInicio,
                 DataVencimentoFim = dataVencimentoFim,
                 IncludeDeleted = includeDeleted,
