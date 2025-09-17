@@ -32,6 +32,10 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<CategoriaTarefa>
             .IsUnique()
             .HasFilter("[IsDeleted] = 0");
 
+        builder.HasIndex(e => new { e.TenantId, e.Ativa });
+
+        builder.HasIndex(e => e.CreatedAt);
+
         builder.HasMany(e => e.Tarefas)
             .WithOne(e => e.Categoria)
             .HasForeignKey(e => e.CategoriaId)

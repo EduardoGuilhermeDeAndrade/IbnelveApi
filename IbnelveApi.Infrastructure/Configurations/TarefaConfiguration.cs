@@ -59,6 +59,7 @@ public class TarefaConfiguration : IEntityTypeConfiguration<Tarefa>
         builder.HasIndex(t => t.TenantId);
         builder.HasIndex(t => t.IsDeleted);
         builder.HasIndex(t => t.CreatedAt);
+        builder.HasIndex(t => t.UserId);
 
         // ADICIONAR:
         builder.HasOne(e => e.Categoria)
