@@ -28,6 +28,15 @@ builder.WebHost.ConfigureKestrel(options =>
 // Add CORS
 builder.Services.AddCors(options =>
 {
+
+    //options.AddPolicy("AllowFrontend", policy =>
+    //{
+    //    policy.WithOrigins("https://localhost:7067")
+    //          .AllowAnyMethod()
+    //          .AllowAnyHeader();
+    //});
+
+
     options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
@@ -40,9 +49,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "IbnelveApi", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "IbnelveApi",
         Version = "v1",
         Description = "API RESTful com Clean Architecture, Multi-tenancy e JWT Authentication"
     });
@@ -104,10 +113,10 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    
+
     // Ensure database is created
     await context.Database.EnsureCreatedAsync();
-    
+
     // Seed data
     await DataSeeder.SeedAsync(context, userManager);
 }
