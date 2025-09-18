@@ -1,0 +1,271 @@
+{
+  "project": {
+    "name": "IbnelveApi",
+    "description": "API RESTful em .NET 9, Clean Architecture, multi-tenancy, JWT, CRUD, soft delete.",
+    "architecture": {
+      "type": "Clean Architecture",
+      "layers": [
+        { "name": "Api", "description": "Camada de Apresentação" },
+        { "name": "Application", "description": "Camada de Aplicação" },
+        { "name": "Domain", "description": "Camada de Domínio" },
+        { "name": "Infrastructure", "description": "Camada de Infraestrutura" },
+        { "name": "IoC", "description": "Injeção de Dependência" },
+        { "name": "Tests", "description": "Testes" }
+      ]
+    },
+    "technologies": {
+      "framework": "NET 9",
+      "language": "C# 12",
+      "web": "ASP.NET Core",
+      "orm": "Entity Framework Core 9.0.7",
+      "database": "SQL Server",
+      "identity": "ASP.NET Identity",
+      "security": ["JWT Bearer", "Multi-tenancy", "Soft Delete"],
+      "validation": "FluentValidation 11.3.1",
+      "documentation": ["Swagger/OpenAPI", "Swashbuckle.AspNetCore 9.0.3"]
+    },
+    "patterns": [
+      "Clean Architecture",
+      "Repository Pattern",
+      "Service Layer",
+      "DTO Pattern"
+    ]
+  },
+  "domain": {
+    "structure": [
+      "Entities",
+      "Enums",
+      "Extensions",
+      "Interfaces",
+      "ValueObjects"
+    ],
+    "entityHierarchy": [
+      "GlobalEntity",
+      "TenantEntity",
+      "UserOwnedEntity"
+    ],
+    "entityExamples": [
+      {
+        "name": "Membro",
+        "base": "UserOwnedEntity",
+        "properties": ["Nome", "CPF", "Telefone", "Endereco", "Tarefas"]
+      }
+    ],
+    "enums": [
+      {
+        "name": "StatusTarefa",
+        "values": ["Pendente", "EmAndamento", "Concluida", "Cancelada"]
+      },
+      {
+        "name": "PrioridadeTarefa",
+        "values": ["Baixa", "Media", "Alta", "Critica"]
+      }
+    ]
+  },
+  "application": {
+    "structure": [
+      "Common",
+      "DTOs",
+      "Extensions",
+      "Interfaces",
+      "Mappings",
+      "Services",
+      "Validators"
+    ],
+    "dtoPattern": {
+      "read": "MembroDto",
+      "create": "CreateMembroDto",
+      "update": "UpdateMembroDto"
+    },
+    "servicePattern": {
+      "interface": "IMembroService",
+      "methods": [
+        "GetAllAsync",
+        "GetByIdAsync",
+        "CreateAsync",
+        "UpdateAsync",
+        "DeleteAsync"
+      ]
+    },
+    "validationPattern": "FluentValidation",
+    "mappingPattern": "Mapping classes e métodos",
+    "responsePattern": "ApiResponse<T>"
+  },
+  "infrastructure": {
+    "structure": [
+      "Configurations",
+      "Data",
+      "Migrations",
+      "Repositories"
+    ],
+    "repositoryPattern": {
+      "interface": "IUserOwnedRepository<T>",
+      "implementation": "UserOwnedRepository<T>"
+    },
+    "efConfiguration": "EntityTypeConfiguration classes"
+  },
+  "api": {
+    "structure": [
+      "Controllers",
+      "Middlewares",
+      "Models",
+      "Properties",
+      "Program.cs",
+      "appsettings.json"
+    ],
+    "controllerPattern": "ApiController, Route, Authorize, CRUD endpoints"
+  },
+  "ioc": {
+    "structure": [
+      "DependencyInjection.cs",
+      "JwtTokenService.cs"
+    ],
+    "mainConfiguration": "AddApplicationServices"
+  },
+  "tests": {
+    "structure": [
+      "Unit",
+      "Integration",
+      "Fixtures"
+    ],
+    "unitExample": "MembroServiceTests"
+  },
+  "conventions": {
+    "naming": {
+      "entities": "PascalCase",
+      "dtos": "PascalCase + Dto",
+      "services": "PascalCase + Service",
+      "interfaces": "I + PascalCase",
+      "validators": "PascalCase + Validator",
+      "methods": "CRUD: GetAllAsync, etc.",
+      "properties": "PascalCase"
+    },
+    "appsettings": {
+      "ConnectionStrings": {
+        "DefaultConnection": "Server=SERVER;Database=IbnelveApiDB01;Trusted_Connection=True;TrustServerCertificate=True;"
+      },
+      "JwtSettings": {
+        "SecretKey": "sua-chave-super-secreta-aqui-com-mais-de-32-caracteres",
+        "Issuer": "IbnelveApi",
+        "Audience": "IbnelveApiUsers",
+        "ExpirationMinutes": 60
+      }
+    },
+    "validations": [
+      "CPF: obrigatório, 11 dígitos, formato e regra",
+      "Telefone: obrigatório, 10-15 dígitos, caracteres válidos",
+      "Endereço: obrigatório, CEP 8 dígitos, UF 2 letras maiúsculas"
+    ],
+    "extensions": [
+      "RemoveSpecialCharacters",
+      "FormatCPF",
+      "FormatTelefone"
+    ]
+  },
+  "commands": {
+    "dotnet": [
+      "restore",
+      "build",
+      "run",
+      "test",
+      "publish"
+    ],
+    "ef": [
+      "migrations add",
+      "database update",
+      "migrations script"
+    ]
+  },
+  "nugetPackages": [
+    { "name": "FluentValidation.AspNetCore", "version": "11.3.1", "layer": "API" },
+    { "name": "Microsoft.AspNetCore.OpenApi", "version": "9.0.4", "layer": "API" },
+    { "name": "Microsoft.EntityFrameworkCore.Design", "version": "9.0.7", "layer": "API" },
+    { "name": "Swashbuckle.AspNetCore", "version": "9.0.3", "layer": "API" },
+    { "name": "Microsoft.EntityFrameworkCore.SqlServer", "version": "9.0.7", "layer": "Infrastructure" },
+    { "name": "Microsoft.AspNetCore.Identity.EntityFrameworkCore", "version": "9.0.4", "layer": "Infrastructure" },
+    { "name": "FluentValidation", "version": "11.9.2", "layer": "Application" },
+    { "name": "Microsoft.NET.Test.Sdk", "version": "17.11.1", "layer": "Tests" },
+    { "name": "xunit", "version": "2.9.2", "layer": "Tests" },
+    { "name": "xunit.runner.visualstudio", "version": "2.8.2", "layer": "Tests" },
+    { "name": "Moq", "version": "4.20.70", "layer": "Tests" }
+  ],
+  "apiEndpoints": [
+    {
+      "group": "auth",
+      "base": "/api/auth",
+      "endpoints": [
+        { "method": "POST", "path": "/register" },
+        { "method": "POST", "path": "/login" }
+      ]
+    },
+    {
+      "group": "membro",
+      "base": "/api/membro",
+      "authRequired": true,
+      "endpoints": [
+        { "method": "GET", "path": "/" },
+        { "method": "GET", "path": "/{id}" },
+        { "method": "GET", "path": "/cpf/{cpf}" },
+        { "method": "GET", "path": "/search?nome={nome}" },
+        { "method": "POST", "path": "/" },
+        { "method": "PUT", "path": "/{id}" },
+        { "method": "DELETE", "path": "/{id}" }
+      ]
+    },
+    {
+      "group": "tarefa",
+      "base": "/api/tarefa",
+      "authRequired": true,
+      "endpoints": [
+        { "method": "GET", "path": "/" },
+        { "method": "GET", "path": "/{id}" },
+        { "method": "GET", "path": "/vencidas" },
+        { "method": "GET", "path": "/status/{status}" },
+        { "method": "POST", "path": "/" },
+        { "method": "PUT", "path": "/{id}" },
+        { "method": "DELETE", "path": "/{id}" }
+      ]
+    },
+    {
+      "group": "categoriatarefa",
+      "base": "/api/categoriatarefa",
+      "authRequired": true,
+      "endpoints": [
+        { "method": "GET", "path": "/" },
+        { "method": "GET", "path": "/{id}" },
+        { "method": "POST", "path": "/" },
+        { "method": "PUT", "path": "/{id}" },
+        { "method": "DELETE", "path": "/{id}" }
+      ]
+    }
+  ],
+  "copilotExamples": [
+    {
+      "type": "entity",
+      "prompt": "// Criar entidade Projeto seguindo o padrão UserOwnedEntity do IbnelveApi\n// com propriedades: Nome, Descricao, DataInicio, DataFim, Status (enum), Orcamento (decimal)\n// incluir relacionamento com Membro e Tarefa"
+    },
+    {
+      "type": "dto",
+      "prompt": "// Criar CreateProjetoDto seguindo padrão do IbnelveApi\n// incluir todas as propriedades necessárias para criação"
+    },
+    {
+      "type": "validator",
+      "prompt": "// Criar CreateProjetoDtoValidator seguindo padrão FluentValidation do IbnelveApi\n// validar Nome (obrigatório, 2-200 chars), DataInicio < DataFim, Orcamento > 0"
+    },
+    {
+      "type": "service",
+      "prompt": "// Criar ProjetoService seguindo padrão IbnelveApi\n// implementar IProjetoService com métodos CRUD padrão\n// incluir validações e mapeamentos"
+    },
+    {
+      "type": "controller",
+      "prompt": "// Criar ProjetoController seguindo padrão IbnelveApi\n// incluir todos os endpoints CRUD com documentação Swagger\n// usar ICurrentUserService para tenantId/userId"
+    }
+  ],
+  "documentation": [
+    "README.md",
+    "README_TAREFAS.md",
+    "API_ENDPOINTS.md",
+    "todo.md"
+  ],
+  "purpose": "Este MCP fornece contexto para aceleração de desenvolvimento com GitHub Copilot, garantindo aderência aos padrões e convenções do IbnelveApi."
+}

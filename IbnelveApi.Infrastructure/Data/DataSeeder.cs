@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.ValueObjects;
 using IbnelveApi.Domain.Enums;
+using IbnelveApi.Domain.Entities;
 
 namespace IbnelveApi.Infrastructure.Data;
 
@@ -22,6 +23,8 @@ public static class DataSeeder
         // Seed de tarefas
         await SeedTarefasAsync(context);
         
+        // Seed de Países e Estados
+        await SeedPaisesEstadosAsync(context);
     }
 
     private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager, ApplicationDbContext context)
@@ -302,6 +305,118 @@ public static class DataSeeder
             };
 
             await context.CategoriaTarefas.AddRangeAsync(categoriaTarefas);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedPaisesEstadosAsync(ApplicationDbContext context)
+    {
+        // Seed País Brasil
+        var paisBrasil = await context.Set<Pais>().FirstOrDefaultAsync(p => p.Nome == "Brasil");
+        if (paisBrasil == null)
+        {
+            paisBrasil = new Pais
+            {
+                Nome = "Brasil",
+                CodigoISO2 = "BR",
+                CodigoISO3 = "BRA",
+                CodigoTelefone = "+55",
+                Ativo = true,
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            context.Set<Pais>().Add(paisBrasil);
+            await context.SaveChangesAsync();
+        }
+
+        // Seed Estado Minas Gerais
+        var estadoMG = await context.Set<Estado>().FirstOrDefaultAsync(e => e.Nome == "Minas Gerais" && e.Sigla == "MG");
+        if (estadoMG == null)
+        {
+            estadoMG = new Estado
+            {
+                Nome = "Minas Gerais",
+                Sigla = "MG",
+                Ativo = true,
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            // Relacionamento
+            if (paisBrasil != null)
+            {
+                estadoMG.PaisId = paisBrasil.Id;
+            }
+            context.Set<Estado>().Add(estadoMG);
+            await context.SaveChangesAsync();
+        }
+
+        // Seed Cidade Belo Horizonte (Minas Gerais)
+        var cidadeBH = await context.Set<Cidade>().FirstOrDefaultAsync(c => c.Nome == "Belo Horizonte" && c.UF == "MG");
+        if (cidadeBH == null && estadoMG != null)
+        {
+            cidadeBH = new Cidade
+            {
+                Nome = "Belo Horizonte",
+                UF = "MG",
+                CEP = "30140071",
+                Ativo = true,
+                Capital = true,
+                EstadoId = estadoMG.Id,
+                CodigoIBGE = "3106200",
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+            context.Set<Cidade>().Add(cidadeBH);
+            await context.SaveChangesAsync();
+        }
+
+        // Seed de todas as cidades de Minas Gerais
+        var cidadesMG = new[]
+        {
+            new { Nome = "Belo Horizonte", CodigoIBGE = "3106200" },
+            new { Nome = "Uberlândia", CodigoIBGE = "3170206" },
+            new { Nome = "Contagem", CodigoIBGE = "3118601" },
+            new { Nome = "Juiz de Fora", CodigoIBGE = "3136702" },
+            new { Nome = "Betim", CodigoIBGE = "3106705" },
+            new { Nome = "Montes Claros", CodigoIBGE = "3143302" },
+            new { Nome = "Ribeirão das Neves", CodigoIBGE = "3154606" },
+            new { Nome = "Uberaba", CodigoIBGE = "3170107" },
+            new { Nome = "Governador Valadares", CodigoIBGE = "3127701" },
+            new { Nome = "Ipatinga", CodigoIBGE = "3131307" },
+            new { Nome = "Divinópolis", CodigoIBGE = "3122306" },
+            new { Nome = "Sete Lagoas", CodigoIBGE = "3167202" },
+            new { Nome = "Santa Luzia", CodigoIBGE = "3157807" },
+            new { Nome = "Ibirité", CodigoIBGE = "3129806" },
+            new { Nome = "Poços de Caldas", CodigoIBGE = "3151800" },
+            new { Nome = "Patos de Minas", CodigoIBGE = "3148004" },
+            new { Nome = "Teófilo Otoni", CodigoIBGE = "3168606" },
+            new { Nome = "Sabará", CodigoIBGE = "3156700" },
+            new { Nome = "Barbacena", CodigoIBGE = "3105608" },
+            new { Nome = "Varginha", CodigoIBGE = "3170701" }
+            // ...adicione mais cidades conforme necessário...
+        };
+        if (estadoMG != null)
+        {
+            foreach (var cidade in cidadesMG)
+            {
+                var exists = await context.Set<Cidade>().AnyAsync(c => c.Nome == cidade.Nome && c.UF == "MG");
+                if (!exists)
+                {
+                    var novaCidade = new Cidade
+                    {
+                        Nome = cidade.Nome,
+                        UF = "MG",
+                        CEP = string.Empty,
+                        Ativo = true,
+                        Capital = cidade.Nome == "Belo Horizonte",
+                        EstadoId = estadoMG.Id,
+                        CodigoIBGE = cidade.CodigoIBGE,
+                        CreatedAt = DateTime.UtcNow,
+                        IsDeleted = false
+                    };
+                    context.Set<Cidade>().Add(novaCidade);
+                }
+            }
             await context.SaveChangesAsync();
         }
     }

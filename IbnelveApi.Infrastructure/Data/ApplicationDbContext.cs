@@ -25,6 +25,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Membro> Membros { get; set; }
     public DbSet<Tarefa> Tarefas { get; set; }
     public DbSet<CategoriaTarefa> CategoriaTarefas { get; set; }
+    public DbSet<Cidade> Cidades { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +34,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         // Aplicar configurações
         modelBuilder.ApplyConfiguration(new MembroConfiguration());
         modelBuilder.ApplyConfiguration(new TarefaConfiguration());
+        modelBuilder.ApplyConfiguration(new CidadeConfiguration());
 
         // Configurar filtros globais
         ConfigureGlobalFilters(modelBuilder);
