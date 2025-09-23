@@ -1,9 +1,5 @@
 ﻿# Model Context Protocol (MCP) — IbnelveApi
 
-> Pequeno guia de contexto para o GitHub Copilot: estilo, arquitetura e regras que devem ser priorizadas nas sugestões.
-
----
-
 ## 1. Propósito
 Fornecer contexto conciso ao Copilot para gerar código alinhado com as convenções e a arquitetura do projeto **IbnelveApi** (API RESTful, .NET 9, Clean Architecture, multi-tenant).
 

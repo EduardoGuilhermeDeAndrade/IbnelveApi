@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# MCP local config
+.mcp.local.json
+
+# Secrets and local env files
+.env
+*.env
