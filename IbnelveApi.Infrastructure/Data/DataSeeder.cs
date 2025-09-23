@@ -351,24 +351,24 @@ public static class DataSeeder
         }
 
         // Seed Cidade Belo Horizonte (Minas Gerais)
-        var cidadeBH = await context.Set<Cidade>().FirstOrDefaultAsync(c => c.Nome == "Belo Horizonte" && c.UF == "MG");
-        if (cidadeBH == null && estadoMG != null)
-        {
-            cidadeBH = new Cidade
-            {
-                Nome = "Belo Horizonte",
-                UF = "MG",
-                CEP = "30140071",
-                Ativo = true,
-                Capital = true,
-                EstadoId = estadoMG.Id,
-                CodigoIBGE = "3106200",
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-            context.Set<Cidade>().Add(cidadeBH);
-            await context.SaveChangesAsync();
-        }
+        //var cidadeBH = await context.Set<Cidade>().FirstOrDefaultAsync(c => c.Nome == "Belo Horizonte" && c.UF == "MG");
+        //if (cidadeBH == null && estadoMG != null)
+        //{
+        //    cidadeBH = new Cidade
+        //    {
+        //        Nome = "Belo Horizonte",
+        //        UF = "MG",
+        //        CEP = "30140071",
+        //        Ativo = true,
+        //        Capital = true,
+        //        EstadoId = estadoMG.Id,
+        //        CodigoIBGE = "3106200",
+        //        CreatedAt = DateTime.UtcNow,
+        //        IsDeleted = false
+        //    };
+        //    context.Set<Cidade>().Add(cidadeBH);
+        //    await context.SaveChangesAsync();
+        //}
 
         // Seed de todas as cidades de Minas Gerais
         var cidadesMG = new[]

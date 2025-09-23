@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbnelveApi.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250923181837_Initial")]
+    [Migration("20250923185047_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -90,7 +90,7 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EstadoId")
+                    b.Property<int>("EstadoId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -533,7 +533,8 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.HasOne("IbnelveApi.Domain.Entities.Estado", "Estado")
                         .WithMany("Cidades")
                         .HasForeignKey("EstadoId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Estado");
                 });

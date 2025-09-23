@@ -288,7 +288,7 @@ namespace IbnelveApi.Infrastructure.Migrations
                     Ativo = table.Column<bool>(type: "bit", nullable: false),
                     CodigoIBGE = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     Capital = table.Column<bool>(type: "bit", nullable: false),
-                    EstadoId = table.Column<int>(type: "int", nullable: true),
+                    EstadoId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)

@@ -8,5 +8,5 @@ public class UpdateCidadeDto
     public bool Ativo { get; set; } = true;
     public string? CodigoIBGE { get; set; }
     public bool Capital { get; set; } = false;
-    public int? EstadoId { get; set; }
+    public int EstadoId { get; set; }
 }
