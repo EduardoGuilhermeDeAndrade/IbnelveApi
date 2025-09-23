@@ -1,4 +1,4 @@
-﻿namespace IbnelveApi.Domain.Entities;
+﻿namespace IbnelveApi.Domain.Entities.General;
 
 /// <summary>
 /// Entidade base para dados globais compartilhados entre TODOS os tenants

@@ -1,4 +1,4 @@
-using IbnelveApi.Domain.Entities;
+using IbnelveApi.Domain.Entities.General;
 
 namespace IbnelveApi.Domain.Interfaces;
 

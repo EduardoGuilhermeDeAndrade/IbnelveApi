@@ -1,3 +1,4 @@
+using IbnelveApi.Domain.Entities.General;
 using IbnelveApi.Domain.ValueObjects;
 
 namespace IbnelveApi.Domain.Entities;

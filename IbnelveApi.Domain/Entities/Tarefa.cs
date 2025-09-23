@@ -1,3 +1,4 @@
+using IbnelveApi.Domain.Entities.General;
 using IbnelveApi.Domain.Enums;
 
 namespace IbnelveApi.Domain.Entities;

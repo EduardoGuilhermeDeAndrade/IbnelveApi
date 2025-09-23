@@ -1,3 +1,4 @@
+using IbnelveApi.Domain.Entities.General;
 using System.Collections.Generic;
 
 namespace IbnelveApi.Domain.Entities

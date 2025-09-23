@@ -1,4 +1,5 @@
 using IbnelveApi.Domain.Entities;
+using IbnelveApi.Domain.Entities.General;
 using IbnelveApi.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

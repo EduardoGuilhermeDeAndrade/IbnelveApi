@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using IbnelveApi.Domain.Entities;
+using IbnelveApi.Domain.Entities.General;
 
 namespace IbnelveApi.Domain.Entities
 {

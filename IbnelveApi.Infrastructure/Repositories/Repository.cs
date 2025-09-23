@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
+using IbnelveApi.Domain.Entities.General;
 
 namespace IbnelveApi.Infrastructure.Repositories;
 
