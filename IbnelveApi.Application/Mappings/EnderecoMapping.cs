@@ -24,7 +24,8 @@ public static class EnderecoMapping
             enderecoDto.CEP.Replace(".", "").Replace("-", "").Replace(" ", ""),
             enderecoDto.Bairro,
             enderecoDto.Cidade,
-            enderecoDto.UF
+            enderecoDto.UF,
+            enderecoDto.Pais
         );
     }
 }

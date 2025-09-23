@@ -63,7 +63,8 @@ public static class MembroMapping
             enderecoDto.CEP.Replace("-", "").Replace(" ", ""),
             enderecoDto.Bairro,
             enderecoDto.Cidade,
-            enderecoDto.UF
+            enderecoDto.UF,
+            enderecoDto.Pais
         );
     }
 }

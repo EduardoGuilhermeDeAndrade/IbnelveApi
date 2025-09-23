@@ -7,5 +7,6 @@ public class EnderecoDto
     public string Bairro { get; set; } = string.Empty;
     public string Cidade { get; set; } = string.Empty;
     public string UF { get; set; } = string.Empty;
+    public string Pais { get; set; } = string.Empty;
 }
 

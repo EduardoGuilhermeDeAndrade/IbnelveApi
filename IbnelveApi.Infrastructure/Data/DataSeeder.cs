@@ -86,7 +86,8 @@ public static class DataSeeder
                         "01234567",
                         "Centro",
                         "São Paulo",
-                        "SP"
+                        "SP",
+                        "Brasil"
                     ),
                     "tenant1"
                 ),
@@ -99,7 +100,8 @@ public static class DataSeeder
                         "22070900",
                         "Copacabana",
                         "Rio de Janeiro",
-                        "RJ"
+                        "RJ",
+                        "Brasil"
                     ),
                     "tenant2"
                 )
