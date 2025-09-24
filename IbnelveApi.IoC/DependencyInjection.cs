@@ -34,6 +34,8 @@ public static class DependencyInjection
         services.AddScoped<ITarefaService, TarefaService>();
         services.AddScoped<ICategoriaTarefaService, CategoriaTarefaService>();
         services.AddScoped<ICidadeService, CidadeService>();
+        services.AddScoped<IUtensilioService, UtensilioService>();
+
 
         //  ADICIONADO: Serviço para capturar contexto do usuário atual
         services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -61,6 +63,10 @@ public static class DependencyInjection
         services.AddScoped<ITarefaRepository, TarefaRepository>();
         services.AddScoped<ICategoriaTarefaRepository, CategoriaTarefaRepository>();
         services.AddScoped<ICidadeRepository, CidadeRepository>();
+        services.AddScoped<IUtensilioRepository, UtensilioRepository>();
+
+        
+        
 
         return services;
     }

@@ -78,7 +78,7 @@ public class CategoriaTarefaService : ICategoriaTarefaService
             }
 
             var dto = categoria.ToDto();
-           // dto.QuantidadeTarefas = await _repository.ContarTarefasAsync(categoria.Id);
+           // dto.QuantidadeTarefas = await _utensilioRepository.ContarTarefasAsync(categoria.Id);
 
             return ApiResponse<CategoriaTarefaDto>.SuccessResult(dto, "Categoria encontrada com sucesso");
         }
@@ -103,7 +103,7 @@ public class CategoriaTarefaService : ICategoriaTarefaService
             var categoria = new CategoriaTarefa(dto.Nome, dto.Descricao, dto.Cor, tenantId, userId);
             
             await _repository.AddAsync(categoria);
-            //await _repository.SaveChangesAsync();
+            //await _utensilioRepository.SaveChangesAsync();
 
             var categoriaDto = categoria.ToDto();
             categoriaDto.QuantidadeTarefas = 0;
@@ -141,10 +141,10 @@ public class CategoriaTarefaService : ICategoriaTarefaService
             categoria.AtualizarDados(dto.Nome, dto.Descricao, dto.Cor);
             
             await _repository.UpdateAsync(categoria);
-            //await _repository.SaveChangesAsync();
+            //await _utensilioRepository.SaveChangesAsync();
 
             var categoriaDto = categoria.ToDto();
-           // categoriaDto.QuantidadeTarefas = await _repository.ContarTarefasAsync(categoria.Id);
+           // categoriaDto.QuantidadeTarefas = await _utensilioRepository.ContarTarefasAsync(categoria.Id);
 
             return ApiResponse<CategoriaTarefaDto>.SuccessResult(
                 categoriaDto, 
@@ -172,7 +172,7 @@ public class CategoriaTarefaService : ICategoriaTarefaService
 
             categoria.Ativar();
             await _repository.UpdateAsync(categoria);
-            //await _repository.SaveChangesAsync();
+            //await _utensilioRepository.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResult(true, "Categoria ativada com sucesso");
         }
@@ -195,7 +195,7 @@ public class CategoriaTarefaService : ICategoriaTarefaService
 
             categoria.Desativar();
             await _repository.UpdateAsync(categoria);
-            //await _repository.SaveChangesAsync();
+            //await _utensilioRepository.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResult(true, "Categoria desativada com sucesso");
         }
@@ -217,7 +217,7 @@ public class CategoriaTarefaService : ICategoriaTarefaService
             }
 
             //// Verificar se está sendo usada por alguma tarefa
-            //if (await _repository.EstaSendoUsadaAsync(id))
+            //if (await _utensilioRepository.EstaSendoUsadaAsync(id))
             //{
             //    return ApiResponse<bool>.ErrorResult(
             //        "Não é possível excluir a categoria pois ela está sendo usada por tarefas"
@@ -225,7 +225,7 @@ public class CategoriaTarefaService : ICategoriaTarefaService
             //}
 
             await _repository.DeleteAsync(id);
-            //await _repository.SaveChangesAsync();
+            //await _utensilioRepository.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResult(true, "Categoria excluída com sucesso");
         }

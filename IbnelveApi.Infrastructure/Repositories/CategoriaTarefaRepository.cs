@@ -63,19 +63,23 @@ public class CategoriaTarefaRepository : Repository<CategoriaTarefa>, ICategoria
         return await query.AnyAsync();
     }
 
-    public Task<CategoriaTarefa?> GetByIdAsync(int id, string tenantId)
+    public async Task<IEnumerable<CategoriaTarefa>> GetAllAsync(string tenantId, bool includeDeleted = false)
     {
-        throw new NotImplementedException();
+        var query = _context.CategoriaTarefas
+            .Where(t => t.TenantId == tenantId);
+
+        if (!includeDeleted)
+            query = query.Where(t => !t.IsDeleted);
+
+        return await query.ToListAsync();
     }
 
-    public Task<IEnumerable<CategoriaTarefa>> GetAllAsync(string tenantId, bool includeDeleted = false)
+    public async Task<IEnumerable<CategoriaTarefa>> GetActiveAsync(string tenantId)
     {
-        throw new NotImplementedException();
-    }
+        var query = _context.CategoriaTarefas
+            .Where(t => t.TenantId == tenantId && t.Ativa == true);
 
-    public Task<IEnumerable<CategoriaTarefa>> GetActiveAsync(string tenantId)
-    {
-        throw new NotImplementedException();
+        return await query.ToListAsync();
     }
 
     public async Task<bool> EstaSendoUsadaAsync(int categoriaId)
@@ -90,6 +94,11 @@ public class CategoriaTarefaRepository : Repository<CategoriaTarefa>, ICategoria
         return await _context.Tarefas
             .Where(t => t.CategoriaId == categoriaId && !t.IsDeleted)
             .CountAsync();
+    }
+
+    public Task<CategoriaTarefa?> GetByIdAsync(int id, string tenantId)
+    {
+        throw new NotImplementedException();
     }
 }
 
