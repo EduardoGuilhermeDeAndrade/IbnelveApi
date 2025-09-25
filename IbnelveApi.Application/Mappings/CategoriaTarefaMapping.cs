@@ -12,9 +12,9 @@ public static class CategoriaMapping
     /// <summary>
     /// Converte Categoria para CategoriaDto
     /// </summary>
-    public static CategoriaDto ToDto(this Categoria categoria)
+    public static CategoriaUtensilioDto ToDto(this CategoriaUtensilio categoria)
     {
-        return new CategoriaDto
+        return new CategoriaUtensilioDto
         {
             Id = categoria.Id,
             Nome = categoria.Nome,
@@ -29,9 +29,9 @@ public static class CategoriaMapping
     /// <summary>
     /// Converte CategoriaTarefa para CategoriaTarefaSelectDto
     /// </summary>
-    public static CategoriaSelectDto ToSelectDto(this Categoria categoria)
+    public static CategoriaUtensilioSelectDto ToSelectDto(this CategoriaUtensilio categoria)
     {
-        return new CategoriaSelectDto
+        return new CategoriaUtensilioSelectDto
         {
             Id = categoria.Id,
             Nome = categoria.Nome,

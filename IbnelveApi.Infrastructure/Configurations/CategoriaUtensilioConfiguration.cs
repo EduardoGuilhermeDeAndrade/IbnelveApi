@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IbnelveApi.Infrastructure.Configurations;
 
-public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
+public class CategoriaUtensilioConfiguration : IEntityTypeConfiguration<CategoriaUtensilio>
 {
-    public void Configure(EntityTypeBuilder<Categoria> builder)
+    
+    public void Configure(EntityTypeBuilder<CategoriaUtensilio> builder)
     {
+        builder.ToTable("CategoriaUtensilios");
+
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Nome).IsRequired().HasMaxLength(100);
         builder.Property(x => x.Descricao).HasMaxLength(500);

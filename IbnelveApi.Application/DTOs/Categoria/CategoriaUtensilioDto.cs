@@ -1,6 +1,6 @@
 namespace IbnelveApi.Application.DTOs.Categoria;
 
-public class CategoriaDto
+public class CategoriaUtensilioDto
 {
     public int Id { get; set; }
     public string Nome { get; set; } = string.Empty;

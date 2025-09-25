@@ -25,6 +25,10 @@ public static class DataSeeder
         
         // Seed de Países e Estados
         await SeedPaisesEstadosAsync(context);
+        
+        // Seed de Categorias de Utensílios
+        await SeedCategoriaUtensiliosAsync(context);
+        await SeedUtensiliosAsync(context);
     }
 
     private static async Task SeedUsersAsync(UserManager<IdentityUser> userManager, ApplicationDbContext context)
@@ -419,6 +423,63 @@ public static class DataSeeder
                     context.Set<Cidade>().Add(novaCidade);
                 }
             }
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedCategoriaUtensiliosAsync(ApplicationDbContext context)
+    {
+        if (!await context.Categoria.AnyAsync())
+        {
+            var categorias = new List<CategoriaUtensilio>
+            {
+                new CategoriaUtensilio("Cozinha", "Utensílios de cozinha", "tenant1", "system"),
+                new CategoriaUtensilio("Escritório", "Utensílios de escritório", "tenant1", "system"),
+                new CategoriaUtensilio("Cozinha", "Utensílios de cozinha", "tenant2", "system"),
+                new CategoriaUtensilio("Escritório", "Utensílios de escritório", "tenant2", "system")
+            };
+
+            await context.Categoria.AddRangeAsync(categorias);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    private static async Task SeedUtensiliosAsync(ApplicationDbContext context)
+    {
+        if (!await context.Utensilios.AnyAsync())
+        {
+            // Buscar categorias por tenant
+            var categoriasTenant1 = await context.Categoria
+                .Where(c => c.TenantId == "tenant1")
+                .ToListAsync();
+            var categoriasTenant2 = await context.Categoria
+                .Where(c => c.TenantId == "tenant2")
+                .ToListAsync();
+
+            // Garantir que temos as duas categorias por tenant
+            var cozinha1 = categoriasTenant1.FirstOrDefault(c => c.Nome == "Cozinha");
+            var escritorio1 = categoriasTenant1.FirstOrDefault(c => c.Nome == "Escritório");
+            var cozinha2 = categoriasTenant2.FirstOrDefault(c => c.Nome == "Cozinha");
+            var escritorio2 = categoriasTenant2.FirstOrDefault(c => c.Nome == "Escritório");
+
+            var utensilios = new List<Utensilio>
+            {
+                // Tenant 1
+                new Utensilio("Geladeira", "Geladeira duplex", "Nova", 3500, DateTime.UtcNow.AddYears(-1), "SN123", "Electrolux", StatusItem.Ativo, cozinha1?.Id ?? 0, "tenant1"),
+                new Utensilio("Fogão", "Fogão 4 bocas", "Com acendimento automático", 1200, DateTime.UtcNow.AddYears(-2), "SN456", "Brastemp", StatusItem.Ativo, cozinha1?.Id ?? 0, "tenant1"),
+                new Utensilio("Notebook", "Notebook Dell", "Inspiron 15", 4500, DateTime.UtcNow.AddMonths(-6), "SN789", "Dell", StatusItem.Ativo, escritorio1?.Id ?? 0, "tenant1"),
+                new Utensilio("Projetor", "Projetor Epson", "HD", 2500, DateTime.UtcNow.AddMonths(-3), "SN321", "Epson", StatusItem.Ativo, escritorio1?.Id ?? 0, "tenant1"),
+                new Utensilio("Cafeteira", "Cafeteira elétrica", "Preta", 300, DateTime.UtcNow.AddMonths(-1), "SN654", "Philco", StatusItem.Ativo, cozinha1?.Id ?? 0, "tenant1"),
+
+                // Tenant 2
+                new Utensilio("Geladeira", "Geladeira Frost Free", "Branca", 3200, DateTime.UtcNow.AddYears(-2), "SN987", "Consul", StatusItem.Ativo, cozinha2?.Id ?? 0, "tenant2"),
+                new Utensilio("Fogão", "Fogão 5 bocas", "Com timer", 1500, DateTime.UtcNow.AddYears(-1), "SN654", "Electrolux", StatusItem.Ativo, cozinha2?.Id ?? 0, "tenant2"),
+                new Utensilio("Notebook", "Notebook Lenovo", "ThinkPad", 5000, DateTime.UtcNow.AddMonths(-8), "SN852", "Lenovo", StatusItem.Ativo, escritorio2?.Id ?? 0, "tenant2"),
+                new Utensilio("Projetor", "Projetor LG", "Full HD", 2700, DateTime.UtcNow.AddMonths(-2), "SN963", "LG", StatusItem.Ativo, escritorio2?.Id ?? 0, "tenant2"),
+                new Utensilio("Cafeteira", "Cafeteira Nespresso", "Vermelha", 600, DateTime.UtcNow.AddMonths(-4), "SN741", "Nespresso", StatusItem.Ativo, cozinha2?.Id ?? 0, "tenant2")
+            };
+
+            await context.Utensilios.AddRangeAsync(utensilios);
             await context.SaveChangesAsync();
         }
     }

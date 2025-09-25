@@ -22,45 +22,6 @@ namespace IbnelveApi.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("IbnelveApi.Domain.Entities.Categoria", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Ativa")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Categoria");
-                });
-
             modelBuilder.Entity("IbnelveApi.Domain.Entities.CategoriaTarefa", b =>
                 {
                     b.Property<int>("Id")
@@ -111,6 +72,45 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.HasIndex("TenantId", "Ativa");
 
                     b.ToTable("CategoriaTarefas", (string)null);
+                });
+
+            modelBuilder.Entity("IbnelveApi.Domain.Entities.CategoriaUtensilio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CategoriaUtensilios", (string)null);
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Cidade", b =>
@@ -726,7 +726,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Utensilio", b =>
                 {
-                    b.HasOne("IbnelveApi.Domain.Entities.Categoria", "Categoria")
+                    b.HasOne("IbnelveApi.Domain.Entities.CategoriaUtensilio", "Categoria")
                         .WithMany("Utensilios")
                         .HasForeignKey("CategoriaId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -786,14 +786,14 @@ namespace IbnelveApi.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("IbnelveApi.Domain.Entities.Categoria", b =>
-                {
-                    b.Navigation("Utensilios");
-                });
-
             modelBuilder.Entity("IbnelveApi.Domain.Entities.CategoriaTarefa", b =>
                 {
                     b.Navigation("Tarefas");
+                });
+
+            modelBuilder.Entity("IbnelveApi.Domain.Entities.CategoriaUtensilio", b =>
+                {
+                    b.Navigation("Utensilios");
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Estado", b =>

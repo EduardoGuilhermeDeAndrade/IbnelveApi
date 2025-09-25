@@ -6,7 +6,7 @@ namespace IbnelveApi.Domain.Entities
     /// <summary>
     /// Representa uma categoria de utensílios.
     /// </summary>
-    public class Categoria : TenantEntity
+    public class CategoriaUtensilio : TenantEntity
     {
         public string Nome { get; set; } = string.Empty;
         public string? Descricao { get; set; }
@@ -15,9 +15,9 @@ namespace IbnelveApi.Domain.Entities
         public ICollection<Utensilio> Utensilios { get; set; } = new List<Utensilio>();
 
 
-        public Categoria() { } // Construtor padrão necessário para EF Core
+        public CategoriaUtensilio() { } // Construtor padrão necessário para EF Core
 
-        public Categoria(string nome, string descricao, string tenantId, string userId)
+        public CategoriaUtensilio(string nome, string descricao, string tenantId, string userId)
         {
             Nome = nome;
             Descricao = descricao;

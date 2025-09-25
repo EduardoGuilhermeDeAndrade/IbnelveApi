@@ -5,20 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IbnelveApi.Infrastructure.Repositories;
 
-public class CategoriaRepository : TenantRepository<Categoria>, ICategoriaRepository
+public class CategoriaUtensilioRepository : TenantRepository<CategoriaUtensilio>, ICategoriaUtensilioRepository
 {
-    public CategoriaRepository(ApplicationDbContext context) : base(context)
+    public CategoriaUtensilioRepository(ApplicationDbContext context) : base(context)
     {
     }
 
-    public async Task<Categoria?> GetByNomeAsync(string nome, string tenantId)
+    public async Task<CategoriaUtensilio?> GetByNomeAsync(string nome, string tenantId)
     {
         return await ApplyTenantFilter(tenantId)
             .Where(c => c.Nome == nome)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Categoria>> SearchAsync(string searchTerm, string tenantId, bool includeInactive = false)
+    public async Task<IEnumerable<CategoriaUtensilio>> SearchAsync(string searchTerm, string tenantId, bool includeInactive = false)
     {
         var termLower = searchTerm.ToLower();
         var query = ApplyTenantFilter(tenantId, includeInactive)
@@ -27,7 +27,7 @@ public class CategoriaRepository : TenantRepository<Categoria>, ICategoriaReposi
         return await query.OrderBy(c => c.Nome).ToListAsync();
     }
 
-    public async Task<IEnumerable<Categoria>> GetWithFiltersAsync(
+    public async Task<IEnumerable<CategoriaUtensilio>> GetWithFiltersAsync(
         string tenantId,
         string? nome = null,
         bool? ativa = null,

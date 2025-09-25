@@ -17,18 +17,37 @@ namespace IbnelveApi.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Cor = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Ativa = table.Column<bool>(type: "bit", nullable: false),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Cor = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: true),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    TenantId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoriaTarefas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoriaUtensilios",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoriaUtensilios", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -45,6 +64,7 @@ namespace IbnelveApi.Infrastructure.Migrations
                     EnderecoBairro = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EnderecoCidade = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EnderecoUF = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
+                    Endereco_Pais = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -141,6 +161,37 @@ namespace IbnelveApi.Infrastructure.Migrations
                         name: "FK_Tarefas_CategoriaTarefas_CategoriaId",
                         column: x => x.CategoriaId,
                         principalTable: "CategoriaTarefas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Utensilios",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Observacoes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    ValorReferencia = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DataCompra = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NumeroSerie = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    NomeFornecedor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Situacao = table.Column<int>(type: "int", nullable: false),
+                    CategoriaId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Utensilios", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Utensilios_CategoriaUtensilios_CategoriaId",
+                        column: x => x.CategoriaId,
+                        principalTable: "CategoriaUtensilios",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
@@ -305,6 +356,23 @@ namespace IbnelveApi.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_CategoriaTarefas_CreatedAt",
+                table: "CategoriaTarefas",
+                column: "CreatedAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoriaTarefas_Nome_TenantId",
+                table: "CategoriaTarefas",
+                columns: new[] { "Nome", "TenantId" },
+                unique: true,
+                filter: "[IsDeleted] = 0");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoriaTarefas_TenantId_Ativa",
+                table: "CategoriaTarefas",
+                columns: new[] { "TenantId", "Ativa" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Cidades_EstadoId",
                 table: "Cidades",
                 column: "EstadoId");
@@ -414,6 +482,11 @@ namespace IbnelveApi.Infrastructure.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Utensilios_CategoriaId",
+                table: "Utensilios",
+                column: "CategoriaId");
         }
 
         /// <inheritdoc />
@@ -444,6 +517,9 @@ namespace IbnelveApi.Infrastructure.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
+                name: "Utensilios");
+
+            migrationBuilder.DropTable(
                 name: "Estado");
 
             migrationBuilder.DropTable(
@@ -454,6 +530,9 @@ namespace IbnelveApi.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "CategoriaUtensilios");
 
             migrationBuilder.DropTable(
                 name: "Pais");

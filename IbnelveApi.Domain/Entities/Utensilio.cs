@@ -18,7 +18,7 @@ public class Utensilio : TenantEntity
     public StatusItem Situacao { get; set; }
 
     public int? CategoriaId { get; set; } // Torna a FK opcional
-    public Categoria Categoria { get; set; } = null!; // Navegação
+    public CategoriaUtensilio Categoria { get; set; } = null!; // Navegação
 
     public Utensilio() { }
 
