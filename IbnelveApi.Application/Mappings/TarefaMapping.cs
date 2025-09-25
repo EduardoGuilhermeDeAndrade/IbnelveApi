@@ -1,4 +1,4 @@
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Tarefa;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.Enums;
 

@@ -1,5 +1,5 @@
-using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Common;
+using IbnelveApi.Application.DTOs.Cidade;
 
 namespace IbnelveApi.Application.Interfaces;
 

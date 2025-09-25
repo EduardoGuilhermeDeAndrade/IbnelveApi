@@ -1,5 +1,5 @@
 using IbnelveApi.Application.Common;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Membro;
 
 namespace IbnelveApi.Application.Interfaces;
 

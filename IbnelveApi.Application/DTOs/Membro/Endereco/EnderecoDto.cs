@@ -1,4 +1,4 @@
-namespace IbnelveApi.Application.DTOs;
+namespace IbnelveApi.Application.DTOs.Membro.Endereco;
 
 public class EnderecoDto
 {

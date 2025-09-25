@@ -1,8 +1,8 @@
 using FluentValidation;
-using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Validators.Support;
 using IbnelveApi.Application.Extensions;
+using IbnelveApi.Application.DTOs.Membro;
 
 namespace IbnelveApi.Application.Validators.Membro;
 

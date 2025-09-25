@@ -5,7 +5,7 @@ using IbnelveApi.Domain.ValueObjects;
 
 namespace IbnelveApi.Infrastructure.Configurations;
 
-public class CategoriaConfiguration : IEntityTypeConfiguration<CategoriaTarefa>
+public class CategoriaTarefaConfiguration : IEntityTypeConfiguration<CategoriaTarefa>
 {
     public void Configure(EntityTypeBuilder<CategoriaTarefa> builder)
     {

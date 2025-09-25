@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.CategoriaTarefa;
 
 namespace IbnelveApi.Application.Validators.CategoriaTarefa;
 

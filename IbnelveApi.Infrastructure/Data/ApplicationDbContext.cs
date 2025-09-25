@@ -26,6 +26,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Membro> Membros { get; set; }
     public DbSet<Tarefa> Tarefas { get; set; }
     public DbSet<CategoriaTarefa> CategoriaTarefas { get; set; }
+    public DbSet<Categoria> Categoria { get; set; }
     public DbSet<Cidade> Cidades { get; set; }
     public DbSet<Utensilio> Utensilios { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,17 +38,19 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.ApplyConfiguration(new TarefaConfiguration());
         modelBuilder.ApplyConfiguration(new CidadeConfiguration());
         modelBuilder.ApplyConfiguration(new UtensilioConfiguration());
+        modelBuilder.ApplyConfiguration(new CategoriaTarefaConfiguration());
+        modelBuilder.ApplyConfiguration(new CategoriaConfiguration());
 
         // Configurar filtros globais
         ConfigureGlobalFilters(modelBuilder);
 
         // Configurar Identity tables
         ConfigureIdentityTables(modelBuilder);
+
     }
 
     private void ConfigureGlobalFilters(ModelBuilder modelBuilder)
     {
-        // ✅ SIMPLIFICADO: Filtros globais mais diretos
 
         // Filtro para TenantEntity (como Membro) - apenas TenantId
         modelBuilder.Entity<Membro>().HasQueryFilter(e =>

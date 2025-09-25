@@ -18,11 +18,14 @@ public class UtensilioConfiguration : IEntityTypeConfiguration<Utensilio>
         builder.Property(x => x.Situacao).IsRequired();
         builder.Property(x => x.TenantId).IsRequired().HasMaxLength(64);
 
-        builder.Property(x => x.CategoriaId).IsRequired();
-        builder.HasOne(x => x.Categoria)
-               .WithMany(x => x.Utensilios)
-               .HasForeignKey(x => x.CategoriaId)
-               .IsRequired();
+        builder.Property(x => x.CategoriaId)
+            .IsRequired(false); // Permite nulo
+
+        builder
+            .HasOne(u => u.Categoria)
+            .WithMany(c => c.Utensilios)
+            .HasForeignKey(u => u.CategoriaId)
+            .OnDelete(DeleteBehavior.SetNull); // FK opcional e comportamento ao deletar
 
         builder.HasQueryFilter(x => !x.IsDeleted);
     }

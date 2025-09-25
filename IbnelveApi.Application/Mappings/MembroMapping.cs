@@ -1,4 +1,5 @@
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Membro;
+using IbnelveApi.Application.DTOs.Membro.Endereco;
 using IbnelveApi.Domain.Entities;
 using IbnelveApi.Domain.ValueObjects;
 

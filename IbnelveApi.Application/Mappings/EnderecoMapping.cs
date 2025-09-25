@@ -1,4 +1,4 @@
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Membro.Endereco;
 using IbnelveApi.Domain.ValueObjects;
 
 namespace IbnelveApi.Application.Mappings;

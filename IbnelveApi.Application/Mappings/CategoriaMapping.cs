@@ -1,40 +1,42 @@
-using IbnelveApi.Application.DTOs.Categoria;
 using IbnelveApi.Application.DTOs.CategoriaTarefa;
 using IbnelveApi.Domain.Entities;
 
 namespace IbnelveApi.Application.Mappings;
 
 /// <summary>
-/// Extensões para mapeamento entre Categoria e DTOs
+/// Extensões para mapeamento entre CategoriaTarefa e DTOs
 /// </summary>
-public static class CategoriaMapping
+public static class CategoriaTarefaMapping
 {
     /// <summary>
-    /// Converte Categoria para CategoriaDto
+    /// Converte CategoriaTarefa para CategoriaDto
     /// </summary>
-    public static CategoriaDto ToDto(this Categoria categoria)
+    public static CategoriaTarefaDto ToDto(this CategoriaTarefa categoria)
     {
-        return new CategoriaDto
+        return new CategoriaTarefaDto
         {
             Id = categoria.Id,
             Nome = categoria.Nome,
             Descricao = categoria.Descricao,
+            Cor = categoria.Cor,
             Ativa = categoria.Ativa,
             TenantId = categoria.TenantId,
             CreatedAt = categoria.CreatedAt,
             UpdatedAt = categoria.UpdatedAt,
+            QuantidadeTarefas = 0 // Será preenchido pelo service
         };
     }
 
     /// <summary>
     /// Converte CategoriaTarefa para CategoriaTarefaSelectDto
     /// </summary>
-    public static CategoriaSelectDto ToSelectDto(this Categoria categoria)
+    public static CategoriaTarefaSelectDto ToSelectDto(this CategoriaTarefa categoria)
     {
-        return new CategoriaSelectDto
+        return new CategoriaTarefaSelectDto
         {
             Id = categoria.Id,
             Nome = categoria.Nome,
+            Cor = categoria.Cor
         };
     }
 

@@ -1,5 +1,5 @@
 using FluentValidation;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.CategoriaTarefa;
 using IbnelveApi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

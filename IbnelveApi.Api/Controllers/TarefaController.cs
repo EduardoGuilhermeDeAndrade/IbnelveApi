@@ -1,5 +1,5 @@
 using IbnelveApi.Application.Common;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Tarefa;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;

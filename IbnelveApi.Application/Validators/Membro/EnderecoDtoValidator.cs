@@ -1,5 +1,5 @@
 using FluentValidation;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Membro.Endereco;
 using IbnelveApi.Application.Extensions;
 
 namespace IbnelveApi.Application.Validators.Membro;

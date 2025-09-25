@@ -1,5 +1,5 @@
 using FluentValidation;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Cidade;
 
 namespace IbnelveApi.Application.Validators;
 

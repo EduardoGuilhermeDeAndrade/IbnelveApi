@@ -1,5 +1,5 @@
 using FluentValidation;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Tarefa;
 using IbnelveApi.Domain.Enums;
 
 namespace IbnelveApi.Application.Validators.Tarefa;

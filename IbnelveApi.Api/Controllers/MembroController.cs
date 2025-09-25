@@ -1,6 +1,6 @@
 using FluentValidation;
 using IbnelveApi.Application.Common;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.Membro;
 using IbnelveApi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

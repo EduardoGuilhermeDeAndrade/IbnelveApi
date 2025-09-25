@@ -1,5 +1,5 @@
 using IbnelveApi.Application.Common;
-using IbnelveApi.Application.DTOs;
+using IbnelveApi.Application.DTOs.CategoriaTarefa;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Mappings;
 using IbnelveApi.Domain.Entities;

@@ -1,10 +1,10 @@
 using IbnelveApi.Domain.Entities;
-using IbnelveApi.Application.DTOs;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Common;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IbnelveApi.Application.DTOs.Cidade;
 
 namespace IbnelveApi.Application.Services;
 

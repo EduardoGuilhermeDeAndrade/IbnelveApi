@@ -18,7 +18,7 @@ public static class UtensilioMapping
             NumeroSerie = entity.NumeroSerie,
             NomeFornecedor = entity.NomeFornecedor,
             Situacao = (int)entity.Situacao,
-            CategoriaId = entity.CategoriaId,
+            CategoriaId = (int)entity.CategoriaId,
             TenantId = entity.TenantId
         };
 
