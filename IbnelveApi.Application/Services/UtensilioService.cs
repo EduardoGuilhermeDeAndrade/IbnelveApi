@@ -48,7 +48,8 @@ public class UtensilioService: IUtensilioService
             dto.DataCompra,
             dto.NumeroSerie,
             dto.NomeFornecedor,
-            (Domain.Enums.StatusItem)dto.Situacao
+            (Domain.Enums.StatusItem)dto.Situacao,
+            dto.CategoriaId
         );
         await _utensilioRepository.UpdateAsync(entity);
         return true;

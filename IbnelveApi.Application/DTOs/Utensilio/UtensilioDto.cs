@@ -14,5 +14,6 @@ public class UtensilioDto
     public string? NumeroSerie { get; set; }
     public string? NomeFornecedor { get; set; }
     public int Situacao { get; set; }
+    public int CategoriaId { get; set; }
     public string TenantId { get; set; } = string.Empty;
 }

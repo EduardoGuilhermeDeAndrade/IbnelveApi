@@ -1,5 +1,6 @@
 using IbnelveApi.Application.Dtos.Utensilio;
 using IbnelveApi.Domain.Entities;
+using System.Reflection.Metadata.Ecma335;
 
 namespace IbnelveApi.Application.Mappings;
 
@@ -17,11 +18,12 @@ public static class UtensilioMapping
             NumeroSerie = entity.NumeroSerie,
             NomeFornecedor = entity.NomeFornecedor,
             Situacao = (int)entity.Situacao,
+            CategoriaId = entity.CategoriaId,
             TenantId = entity.TenantId
         };
 
     public static Utensilio ToEntity(this CreateUtensilioDto dto, string tenantId)
-        => new(
+        => new( 
             dto.Nome,
             dto.Descricao,
             dto.Observacoes,
@@ -30,6 +32,7 @@ public static class UtensilioMapping
             dto.NumeroSerie,
             dto.NomeFornecedor,
             (Domain.Enums.StatusItem)dto.Situacao,
-            tenantId
+            dto.CategoriaId,
+                tenantId
         );
 }

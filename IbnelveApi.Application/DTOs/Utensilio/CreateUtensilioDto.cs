@@ -13,4 +13,5 @@ public class CreateUtensilioDto
     public string? NumeroSerie { get; set; }
     public string? NomeFornecedor { get; set; }
     public int Situacao { get; set; }
+    public int CategoriaId { get; set; }
 }

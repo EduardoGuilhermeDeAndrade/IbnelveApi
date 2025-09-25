@@ -17,18 +17,12 @@ public class Utensilio : TenantEntity
     public string? NomeFornecedor { get; set; }
     public StatusItem Situacao { get; set; }
 
+    public int CategoriaId { get; set; }
+    public Categoria Categoria { get; set; } = null!;
+
     public Utensilio() { }
 
-    public Utensilio(
-        string nome,
-        string? descricao,
-        string? observacoes,
-        decimal? valorReferencia,
-        DateTime? dataCompra,
-        string? numeroSerie,
-        string? nomeFornecedor,
-        StatusItem situacao,
-        string tenantId)
+    public Utensilio(string nome, string? descricao, string? observacoes, decimal? valorReferencia, DateTime? dataCompra, string? numeroSerie, string? nomeFornecedor, StatusItem situacao, int categoriaId, string tenantId)
     {
         Nome = nome;
         Descricao = descricao;
@@ -38,8 +32,34 @@ public class Utensilio : TenantEntity
         NumeroSerie = numeroSerie;
         NomeFornecedor = nomeFornecedor;
         Situacao = situacao;
+        CategoriaId = categoriaId;
         TenantId = tenantId;
     }
+
+    //public Utensilio(
+    //    string nome,
+    //    string? descricao,
+    //    string? observacoes,
+    //    decimal? valorReferencia,
+    //    DateTime? dataCompra,
+    //    string? numeroSerie,
+    //    string? nomeFornecedor,
+    //    StatusItem situacao,
+    //    string tenantId,
+    //    int categoriaId
+    //    )
+    //{
+    //    Nome = nome;
+    //    Descricao = descricao;
+    //    Observacoes = observacoes;
+    //    ValorReferencia = valorReferencia;
+    //    DataCompra = dataCompra;
+    //    NumeroSerie = numeroSerie;
+    //    NomeFornecedor = nomeFornecedor;
+    //    Situacao = situacao;
+    //    CategoriaId = categoriaId;
+    //    TenantId = tenantId;
+    //}
 
     public void AtualizarDados(
         string nome,
@@ -49,7 +69,8 @@ public class Utensilio : TenantEntity
         DateTime? dataCompra,
         string? numeroSerie,
         string? nomeFornecedor,
-        StatusItem situacao)
+        StatusItem situacao,
+        int categoriaId)
     {
         Nome = nome;
         Descricao = descricao;
@@ -59,6 +80,7 @@ public class Utensilio : TenantEntity
         NumeroSerie = numeroSerie;
         NomeFornecedor = nomeFornecedor;
         Situacao = situacao;
+        CategoriaId = categoriaId;
         UpdatedAt = DateTime.UtcNow;
     }
 }
