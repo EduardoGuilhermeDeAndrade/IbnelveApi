@@ -1,4 +1,3 @@
-using FluentValidation;
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs.Membro;
 using IbnelveApi.Application.Interfaces;
@@ -12,21 +11,15 @@ namespace IbnelveApi.Api.Controllers;
 [Authorize]
 public class MembroController : ControllerBase
 {
-    private readonly IValidator<CreateMembroDto> _validatorCreate;
-    private readonly IValidator<UpdateMembroDto> _validatorUpdate;
     private readonly IMembroService _membroService;
-    private readonly ICurrentUserService _currentUserService; 
+    private readonly string _tenantId;
 
     public MembroController(
-        IValidator<CreateMembroDto> validatorCreate,
-        IValidator<UpdateMembroDto> validatorUpdate,
         IMembroService membroService,
-        ICurrentUserService currentUserService) 
+        ICurrentUserService currentUserService)
     {
-        _validatorCreate = validatorCreate;
-        _validatorUpdate = validatorUpdate;
         _membroService = membroService;
-        _currentUserService = currentUserService; 
+        _tenantId = currentUserService.GetTenantId();
     }
 
     /// <summary>
@@ -38,12 +31,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<IEnumerable<MembroDto>>.ErrorResult("TenantId não encontrado"));
 
-            var membros = await _membroService.GetAllAsync(tenantId, includeDeleted); 
+            var membros = await _membroService.GetAllAsync(_tenantId, includeDeleted);
             return Ok(membros);
         }
         catch (Exception ex)
@@ -60,12 +51,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<MembroDto>.ErrorResult("TenantId não encontrado"));
 
-            var membro = await _membroService.GetByIdAsync(id, tenantId); 
+            var membro = await _membroService.GetByIdAsync(id, _tenantId);
 
             if (!membro.Success)
                 return NotFound(membro);
@@ -86,12 +75,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<MembroDto>.ErrorResult("TenantId não encontrado"));
 
-            var membro = await _membroService.GetByCpfAsync(cpf, tenantId); 
+            var membro = await _membroService.GetByCpfAsync(cpf, _tenantId);
 
             if (!membro.Success)
                 return NotFound(membro);
@@ -112,12 +99,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<IEnumerable<MembroDto>>.ErrorResult("TenantId não encontrado"));
 
-            var membros = await _membroService.GetByNomeAsync(nome, tenantId); 
+            var membros = await _membroService.GetByNomeAsync(nome, _tenantId);
             return Ok(membros);
         }
         catch (Exception ex)
@@ -139,12 +124,10 @@ public class MembroController : ControllerBase
             if (string.IsNullOrWhiteSpace(searchTerm))
                 return BadRequest(ApiResponse<IEnumerable<MembroDto>>.ErrorResult("Termo de busca é obrigatório"));
 
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<IEnumerable<MembroDto>>.ErrorResult("TenantId não encontrado"));
 
-            var membros = await _membroService.SearchAsync(searchTerm, tenantId, includeDeleted); 
+            var membros = await _membroService.SearchAsync(searchTerm, _tenantId, includeDeleted);
             return Ok(membros);
         }
         catch (Exception ex)
@@ -167,13 +150,11 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<IEnumerable<MembroDto>>.ErrorResult("TenantId não encontrado"));
 
             var membros = await _membroService.GetWithFiltersAsync(
-                tenantId, nome, cpf, cidade, uf, includeDeleted, orderBy);
+                _tenantId, nome, cpf, cidade, uf, includeDeleted, orderBy);
 
             return Ok(membros);
         }
@@ -191,19 +172,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var validationResult = await _validatorCreate.ValidateAsync(createDto);
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return BadRequest(ApiResponse<MembroDto>.ErrorResult("Dados inválidos", errors));
-            }
-
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<MembroDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _membroService.CreateAsync(createDto, tenantId); 
+            var result = await _membroService.CreateAsync(createDto, _tenantId);
 
             if (result.Success)
                 return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
@@ -224,19 +196,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var validationResult = await _validatorUpdate.ValidateAsync(updateDto);
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return BadRequest(ApiResponse<MembroDto>.ErrorResult("Dados inválidos", errors));
-            }
-
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<MembroDto>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _membroService.UpdateAsync(id, updateDto, tenantId); 
+            var result = await _membroService.UpdateAsync(id, updateDto, _tenantId);
 
             if (result.Success)
                 return Ok(result);
@@ -257,12 +220,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<bool>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _membroService.DeleteAsync(id, tenantId); 
+            var result = await _membroService.DeleteAsync(id, _tenantId);
 
             if (result.Success)
                 return Ok(result);
@@ -283,12 +244,10 @@ public class MembroController : ControllerBase
     {
         try
         {
-            var tenantId = _currentUserService.GetTenantId(); 
-
-            if (string.IsNullOrEmpty(tenantId))
+            if (string.IsNullOrEmpty(_tenantId))
                 return BadRequest(ApiResponse<bool>.ErrorResult("TenantId não encontrado"));
 
-            var result = await _membroService.CpfExistsAsync(cpf, tenantId, excludeId); 
+            var result = await _membroService.CpfExistsAsync(cpf, _tenantId, excludeId);
             return Ok(result);
         }
         catch (Exception ex)

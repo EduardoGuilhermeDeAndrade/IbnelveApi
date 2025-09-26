@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using IbnelveApi.Application.DTOs.LocalDeArmazenamento;
-using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.DTOs.FotoUtensilio;
+using IbnelveApi.Application.Interfaces;
 
 
 [Authorize]
@@ -14,15 +12,16 @@ public class FotoUtensilioController : ControllerBase
     private readonly IFotoUtensilioService _service;
     private readonly IFotoStorageService _fotoStorageService;
     private readonly string _tenantId;
-    public FotoUtensilioController(IFotoUtensilioService service, IFotoStorageService fotoStorageService)
+
+    public FotoUtensilioController(
+        IFotoUtensilioService service,
+        IFotoStorageService fotoStorageService,
+        ICurrentUserService currentUserService)
     {
         _service = service;
         _fotoStorageService = fotoStorageService;
-        _tenantId = GetTenantId();
+        _tenantId = currentUserService.GetTenantId();
     }
-
-    private string GetTenantId() =>
-        User.FindFirstValue("TenantId") ?? throw new UnauthorizedAccessException("TenantId não encontrado.");
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -37,6 +36,9 @@ public class FotoUtensilioController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
+        if (string.IsNullOrEmpty(_tenantId))
+            return BadRequest("TenantId não encontrado");
+
         var result = await _service.GetByIdAsync(id, _tenantId);
         return Ok(result);
     }
@@ -44,6 +46,9 @@ public class FotoUtensilioController : ControllerBase
     [HttpPost("{utensilioId}")]
     public async Task<IActionResult> Create(int utensilioId, [FromBody] CreateFotoUtensilioDto dto)
     {
+        if (string.IsNullOrEmpty(_tenantId))
+            return BadRequest("TenantId não encontrado");
+
         var result = await _service.CreateAsync(dto, utensilioId, _tenantId);
         return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
     }
@@ -51,6 +56,9 @@ public class FotoUtensilioController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateFotoUtensilioDto dto)
     {
+        if (string.IsNullOrEmpty(_tenantId))
+            return BadRequest("TenantId não encontrado");
+
         var result = await _service.UpdateAsync(id, dto, _tenantId);
         return Ok(result);
     }
@@ -58,6 +66,9 @@ public class FotoUtensilioController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
+        if (string.IsNullOrEmpty(_tenantId))
+            return BadRequest("TenantId não encontrado");
+
         var result = await _service.DeleteAsync(id, _tenantId);
         return Ok(result);
     }

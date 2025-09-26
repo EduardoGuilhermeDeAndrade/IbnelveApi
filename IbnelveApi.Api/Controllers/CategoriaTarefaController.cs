@@ -1,4 +1,3 @@
-using FluentValidation;
 using IbnelveApi.Application.DTOs.CategoriaTarefa;
 using IbnelveApi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -16,17 +15,14 @@ namespace IbnelveApi.Api.Controllers;
 public class CategoriaTarefaController : ControllerBase
 {
     private readonly ICategoriaTarefaService _service;
-    private readonly IValidator<CreateCategoriaTarefaDto> _createValidator;
-    private readonly IValidator<UpdateCategoriaTarefaDto> _updateValidator;
+    private readonly string _tenantId;
 
     public CategoriaTarefaController(
         ICategoriaTarefaService service,
-        IValidator<CreateCategoriaTarefaDto> createValidator,
-        IValidator<UpdateCategoriaTarefaDto> updateValidator)
+        ICurrentUserService currentUserService)
     {
         _service = service;
-        _createValidator = createValidator;
-        _updateValidator = updateValidator;
+        _tenantId = currentUserService.GetTenantId();
     }
 
     /// <summary>
@@ -35,18 +31,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] bool includeDeleted = false)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.GetAllAsync(tenantId, includeDeleted);
-        
+        var result = await _service.GetAllAsync(_tenantId, includeDeleted);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return BadRequest(result);
     }
@@ -57,18 +48,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpGet("ativas")]
     public async Task<IActionResult> GetAtivasForSelect()
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.GetAtivasForSelectAsync(tenantId);
-        
+        var result = await _service.GetAtivasForSelectAsync(_tenantId);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return BadRequest(result);
     }
@@ -79,18 +65,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.GetByIdAsync(id, tenantId);
-        
+        var result = await _service.GetByIdAsync(id, _tenantId);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return NotFound(result);
     }
@@ -101,26 +82,15 @@ public class CategoriaTarefaController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateCategoriaTarefaDto dto)
     {
-        var validationResult = await _createValidator.ValidateAsync(dto);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-
-        var tenantId = User.FindFirst("TenantId")?.Value;
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (string.IsNullOrEmpty(tenantId) || string.IsNullOrEmpty(userId))
-        {
+        if (string.IsNullOrEmpty(_tenantId) || string.IsNullOrEmpty(userId))
             return BadRequest("TenantId ou UserId não encontrado");
-        }
 
-        var result = await _service.CreateAsync(dto, tenantId, userId);
-        
+        var result = await _service.CreateAsync(dto, _tenantId, userId);
+
         if (result.Success)
-        {
             return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
-        }
 
         return BadRequest(result);
     }
@@ -131,24 +101,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoriaTarefaDto dto)
     {
-        var validationResult = await _updateValidator.ValidateAsync(dto);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.UpdateAsync(id, dto, tenantId);
-        
+        var result = await _service.UpdateAsync(id, dto, _tenantId);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return BadRequest(result);
     }
@@ -159,18 +118,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpPatch("{id}/ativar")]
     public async Task<IActionResult> Ativar(int id)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.AtivarAsync(id, tenantId);
-        
+        var result = await _service.AtivarAsync(id, _tenantId);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return BadRequest(result);
     }
@@ -181,18 +135,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpPatch("{id}/desativar")]
     public async Task<IActionResult> Desativar(int id)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.DesativarAsync(id, tenantId);
-        
+        var result = await _service.DesativarAsync(id, _tenantId);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return BadRequest(result);
     }
@@ -203,18 +152,13 @@ public class CategoriaTarefaController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
-        {
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
-        }
 
-        var result = await _service.DeleteAsync(id, tenantId);
-        
+        var result = await _service.DeleteAsync(id, _tenantId);
+
         if (result.Success)
-        {
             return Ok(result);
-        }
 
         return BadRequest(result);
     }

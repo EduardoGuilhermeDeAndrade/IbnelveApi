@@ -1,4 +1,3 @@
-using FluentValidation;
 using IbnelveApi.Application.Common;
 using IbnelveApi.Application.DTOs.Categoria;
 using IbnelveApi.Application.Interfaces;
@@ -8,44 +7,38 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class CategoriaController : ControllerBase
+public class CategoriaUtensilioController : ControllerBase
 {
-    private readonly IValidator<CreateCategoriaUtensilioDto> _validatorCreate;
-    private readonly IValidator<UpdateCategoriaUtensilioDto> _validatorUpdate;
     private readonly ICategoriaUtensilioService _categoriaService;
     private readonly ICurrentUserService _currentUserService;
+    private readonly string _tenantId;
 
-    public CategoriaController(
-        IValidator<CreateCategoriaUtensilioDto> validatorCreate,
-        IValidator<UpdateCategoriaUtensilioDto> validatorUpdate,
+    public CategoriaUtensilioController(
         ICategoriaUtensilioService categoriaService,
         ICurrentUserService currentUserService)
     {
-        _validatorCreate = validatorCreate;
-        _validatorUpdate = validatorUpdate;
         _categoriaService = categoriaService;
         _currentUserService = currentUserService;
+        _tenantId = _currentUserService.GetTenantId();
     }
 
     [HttpGet]
     public async Task<ActionResult<ApiResponse<IEnumerable<CategoriaUtensilioDto>>>> GetAll([FromQuery] bool includeInactive = false)
     {
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<IEnumerable<CategoriaUtensilioDto>>.ErrorResult("TenantId não encontrado"));
 
-        var categorias = await _categoriaService.GetAllAsync(tenantId, includeInactive);
+        var categorias = await _categoriaService.GetAllAsync(_tenantId, includeInactive);
         return Ok(categorias);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<CategoriaUtensilioDto>>> GetById(int id)
     {
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<CategoriaUtensilioDto>.ErrorResult("TenantId não encontrado"));
 
-        var categoria = await _categoriaService.GetByIdAsync(id, tenantId);
+        var categoria = await _categoriaService.GetByIdAsync(id, _tenantId);
         if (!categoria.Success)
             return NotFound(categoria);
 
@@ -55,11 +48,10 @@ public class CategoriaController : ControllerBase
     [HttpGet("nome/{nome}")]
     public async Task<ActionResult<ApiResponse<CategoriaUtensilioDto>>> GetByNome(string nome)
     {
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<CategoriaUtensilioDto>.ErrorResult("TenantId não encontrado"));
 
-        var categoria = await _categoriaService.GetByNomeAsync(nome, tenantId);
+        var categoria = await _categoriaService.GetByNomeAsync(nome, _tenantId);
         if (!categoria.Success)
             return NotFound(categoria);
 
@@ -72,11 +64,10 @@ public class CategoriaController : ControllerBase
         if (string.IsNullOrWhiteSpace(searchTerm))
             return BadRequest(ApiResponse<IEnumerable<CategoriaUtensilioDto>>.ErrorResult("Termo de busca é obrigatório"));
 
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<IEnumerable<CategoriaUtensilioDto>>.ErrorResult("TenantId não encontrado"));
 
-        var categorias = await _categoriaService.SearchAsync(searchTerm, tenantId, includeInactive);
+        var categorias = await _categoriaService.SearchAsync(searchTerm, _tenantId, includeInactive);
         return Ok(categorias);
     }
 
@@ -87,29 +78,20 @@ public class CategoriaController : ControllerBase
         [FromQuery] bool includeInactive = false,
         [FromQuery] string orderBy = "Nome")
     {
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<IEnumerable<CategoriaUtensilioDto>>.ErrorResult("TenantId não encontrado"));
 
-        var categorias = await _categoriaService.GetWithFiltersAsync(tenantId, nome, ativa, includeInactive, orderBy);
+        var categorias = await _categoriaService.GetWithFiltersAsync(_tenantId, nome, ativa, includeInactive, orderBy);
         return Ok(categorias);
     }
 
     [HttpPost]
     public async Task<ActionResult<ApiResponse<CategoriaUtensilioDto>>> Create([FromBody] CreateCategoriaUtensilioDto createDto)
     {
-        var validationResult = await _validatorCreate.ValidateAsync(createDto);
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            return BadRequest(ApiResponse<CategoriaUtensilioDto>.ErrorResult("Dados inválidos", errors));
-        }
-
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<CategoriaUtensilioDto>.ErrorResult("TenantId não encontrado"));
 
-        var result = await _categoriaService.CreateAsync(createDto, tenantId);
+        var result = await _categoriaService.CreateAsync(createDto, _tenantId);
         if (result.Success)
             return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result);
 
@@ -119,18 +101,10 @@ public class CategoriaController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ApiResponse<CategoriaUtensilioDto>>> Update(int id, [FromBody] UpdateCategoriaUtensilioDto updateDto)
     {
-        var validationResult = await _validatorUpdate.ValidateAsync(updateDto);
-        if (!validationResult.IsValid)
-        {
-            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            return BadRequest(ApiResponse<CategoriaUtensilioDto>.ErrorResult("Dados inválidos", errors));
-        }
-
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<CategoriaUtensilioDto>.ErrorResult("TenantId não encontrado"));
 
-        var result = await _categoriaService.UpdateAsync(id, updateDto, tenantId);
+        var result = await _categoriaService.UpdateAsync(id, updateDto, _tenantId);
         if (result.Success)
             return Ok(result);
 
@@ -140,11 +114,10 @@ public class CategoriaController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> Delete(int id)
     {
-        var tenantId = _currentUserService.GetTenantId();
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest(ApiResponse<bool>.ErrorResult("TenantId não encontrado"));
 
-        var result = await _categoriaService.DeleteAsync(id, tenantId);
+        var result = await _categoriaService.DeleteAsync(id, _tenantId);
         if (result.Success)
             return Ok(result);
 

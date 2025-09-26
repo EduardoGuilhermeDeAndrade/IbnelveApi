@@ -2,9 +2,9 @@ using IbnelveApi.Application.DTOs.LocalDeArmazenamento;
 using IbnelveApi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace IbnelveApi.Api.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -13,14 +13,13 @@ public class LocalDeArmazenamentoController : ControllerBase
     private readonly ILocalDeArmazenamentoService _service;
     private readonly string _tenantId;
 
-    public LocalDeArmazenamentoController(ILocalDeArmazenamentoService service)
+    public LocalDeArmazenamentoController(
+        ILocalDeArmazenamentoService service,
+        ICurrentUserService currentUserService)
     {
         _service = service;
-        _tenantId = GetTenantId();
+        _tenantId = currentUserService.GetTenantId();
     }
-
-    private string GetTenantId() =>
-        User.FindFirstValue("TenantId") ?? throw new UnauthorizedAccessException("TenantId não encontrado.");
 
     [HttpGet]
     public async Task<IActionResult> GetAll()

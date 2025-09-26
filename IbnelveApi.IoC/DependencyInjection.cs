@@ -1,6 +1,7 @@
 using FluentValidation;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Services;
+using IbnelveApi.Application.Validators.CategoriaTarefa;
 using IbnelveApi.Application.Validators.Membro;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
@@ -46,6 +47,7 @@ public static class DependencyInjection
 
         // ===== VALIDATION =====
         services.AddValidatorsFromAssemblyContaining<CreateMembroDtoValidator>();
+
         //Não necessário registrar todos, pois o FluentValidation já faz isso automaticamente
 
         // ===== REPOSITORIES =====
