@@ -51,6 +51,26 @@ namespace IbnelveApi.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LocaisDeArmazenamento",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    ContatoResponsavel = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocaisDeArmazenamento", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Membros",
                 columns: table => new
                 {
@@ -173,13 +193,14 @@ namespace IbnelveApi.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Observacoes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Observacoes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ValorReferencia = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DataCompra = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NumeroSerie = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    NomeFornecedor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    NumeroSerie = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NomeFornecedor = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Situacao = table.Column<int>(type: "int", nullable: false),
-                    CategoriaId = table.Column<int>(type: "int", nullable: true),
+                    CategoriaId = table.Column<int>(type: "int", nullable: false),
+                    LocalDeArmazenamentoId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -193,7 +214,12 @@ namespace IbnelveApi.Infrastructure.Migrations
                         column: x => x.CategoriaId,
                         principalTable: "CategoriaUtensilios",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Utensilios_LocaisDeArmazenamento_LocalDeArmazenamentoId",
+                        column: x => x.LocalDeArmazenamentoId,
+                        principalTable: "LocaisDeArmazenamento",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -328,6 +354,32 @@ namespace IbnelveApi.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FotoUtensilio",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UtensilioId = table.Column<int>(type: "int", nullable: false),
+                    ArquivoPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPrincipal = table.Column<bool>(type: "bit", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TenantId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FotoUtensilio", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FotoUtensilio_Utensilios_UtensilioId",
+                        column: x => x.UtensilioId,
+                        principalTable: "Utensilios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Cidades",
                 columns: table => new
                 {
@@ -381,6 +433,11 @@ namespace IbnelveApi.Infrastructure.Migrations
                 name: "IX_Estado_PaisId",
                 table: "Estado",
                 column: "PaisId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FotoUtensilio_UtensilioId",
+                table: "FotoUtensilio",
+                column: "UtensilioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Membros_IsDeleted",
@@ -487,6 +544,11 @@ namespace IbnelveApi.Infrastructure.Migrations
                 name: "IX_Utensilios_CategoriaId",
                 table: "Utensilios",
                 column: "CategoriaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Utensilios_LocalDeArmazenamentoId",
+                table: "Utensilios",
+                column: "LocalDeArmazenamentoId");
         }
 
         /// <inheritdoc />
@@ -494,6 +556,9 @@ namespace IbnelveApi.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Cidades");
+
+            migrationBuilder.DropTable(
+                name: "FotoUtensilio");
 
             migrationBuilder.DropTable(
                 name: "Membros");
@@ -517,10 +582,10 @@ namespace IbnelveApi.Infrastructure.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
-                name: "Utensilios");
+                name: "Estado");
 
             migrationBuilder.DropTable(
-                name: "Estado");
+                name: "Utensilios");
 
             migrationBuilder.DropTable(
                 name: "CategoriaTarefas");
@@ -532,10 +597,13 @@ namespace IbnelveApi.Infrastructure.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
+                name: "Pais");
+
+            migrationBuilder.DropTable(
                 name: "CategoriaUtensilios");
 
             migrationBuilder.DropTable(
-                name: "Pais");
+                name: "LocaisDeArmazenamento");
         }
     }
 }

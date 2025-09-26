@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IbnelveApi.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250925192943_CreateRelationUtensilioLocalDeArmazenamento")]
-    partial class CreateRelationUtensilioLocalDeArmazenamento
+    [Migration("20250926232421_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,47 @@ namespace IbnelveApi.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("FotoUtensilio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArquivoPath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPrincipal")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TenantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UtensilioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UtensilioId");
+
+                    b.ToTable("FotoUtensilio");
+                });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.CategoriaTarefa", b =>
                 {
@@ -471,9 +512,6 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UtensilioId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("ValorReferencia")
                         .HasColumnType("decimal(18,2)");
 
@@ -482,8 +520,6 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.HasIndex("CategoriaId");
 
                     b.HasIndex("LocalDeArmazenamentoId");
-
-                    b.HasIndex("UtensilioId");
 
                     b.ToTable("Utensilios", (string)null);
                 });
@@ -692,6 +728,17 @@ namespace IbnelveApi.Infrastructure.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FotoUtensilio", b =>
+                {
+                    b.HasOne("IbnelveApi.Domain.Entities.Utensilio", "Utensilio")
+                        .WithMany("Fotos")
+                        .HasForeignKey("UtensilioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Utensilio");
+                });
+
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Cidade", b =>
                 {
                     b.HasOne("IbnelveApi.Domain.Entities.Estado", "Estado")
@@ -789,10 +836,6 @@ namespace IbnelveApi.Infrastructure.Migrations
                         .WithMany("Utensilios")
                         .HasForeignKey("LocalDeArmazenamentoId");
 
-                    b.HasOne("IbnelveApi.Domain.Entities.Utensilio", null)
-                        .WithMany("Utensilios")
-                        .HasForeignKey("UtensilioId");
-
                     b.Navigation("Categoria");
 
                     b.Navigation("LocalDeArmazenamento");
@@ -876,7 +919,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Utensilio", b =>
                 {
-                    b.Navigation("Utensilios");
+                    b.Navigation("Fotos");
                 });
 #pragma warning restore 612, 618
         }
