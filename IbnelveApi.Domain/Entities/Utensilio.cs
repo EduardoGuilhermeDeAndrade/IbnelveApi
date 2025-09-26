@@ -22,6 +22,9 @@ public class Utensilio : TenantEntity
     public int? LocalDeArmazenamentoId { get; set; }
     public LocalDeArmazenamento? LocalDeArmazenamento { get; set; }
 
+    // Propriedade de navegação para fotos
+    public ICollection<FotoUtensilio> Fotos { get; set; } = new List<FotoUtensilio>();
+
     public Utensilio() { }
 
     public Utensilio(string nome, string? descricao, string? observacoes, decimal? valorReferencia, DateTime? dataCompra, string? numeroSerie, string? nomeFornecedor, StatusItem situacao, int categoriaId, string tenantId)
@@ -37,31 +40,6 @@ public class Utensilio : TenantEntity
         CategoriaId = categoriaId;
         TenantId = tenantId;
     }
-
-    //public Utensilio(
-    //    string nome,
-    //    string? descricao,
-    //    string? observacoes,
-    //    decimal? valorReferencia,
-    //    DateTime? dataCompra,
-    //    string? numeroSerie,
-    //    string? nomeFornecedor,
-    //    StatusItem situacao,
-    //    string tenantId,
-    //    int categoriaId
-    //    )
-    //{
-    //    Nome = nome;
-    //    Descricao = descricao;
-    //    Observacoes = observacoes;
-    //    ValorReferencia = valorReferencia;
-    //    DataCompra = dataCompra;
-    //    NumeroSerie = numeroSerie;
-    //    NomeFornecedor = nomeFornecedor;
-    //    Situacao = situacao;
-    //    CategoriaId = categoriaId;
-    //    TenantId = tenantId;
-    //}
 
     public void AtualizarDados(
         string nome,
@@ -85,6 +63,4 @@ public class Utensilio : TenantEntity
         CategoriaId = categoriaId;
         UpdatedAt = DateTime.UtcNow;
     }
-
-    public ICollection<Utensilio> Utensilios { get; set; } = new List<Utensilio>();
 }

@@ -1,4 +1,6 @@
 using IbnelveApi.Api.middlewares;
+using IbnelveApi.Api.Services;
+using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Infrastructure.Data;
 using IbnelveApi.IoC;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +15,9 @@ builder.Services
 
 // Add all dependencies (Infrastructure, Application, Repositories)
 builder.Services.AddAllDependencies(builder.Configuration);
+
+// Registro do serviço específico da Api
+builder.Services.AddScoped<IFotoStorageService, FotoStorageService>();
 
 //Corrige pois não estava abrindo no localhost, somente pelo ip http://127.0.0.1:5000/index.html
 //Agora abre normalmente pelo: http://localhost:5082/index.html

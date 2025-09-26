@@ -11,31 +11,34 @@ namespace IbnelveApi.Api.Controllers;
 public class LocalDeArmazenamentoController : ControllerBase
 {
     private readonly ILocalDeArmazenamentoService _service;
+    private readonly string _tenantId;
 
     public LocalDeArmazenamentoController(ILocalDeArmazenamentoService service)
     {
         _service = service;
+        _tenantId = GetTenantId();
     }
+
+    private string GetTenantId() =>
+        User.FindFirstValue("TenantId") ?? throw new UnauthorizedAccessException("TenantId não encontrado.");
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
 
-        var result = await _service.GetAllAsync(tenantId);
+        var result = await _service.GetAllAsync(_tenantId);
         return Ok(result);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
 
-        var result = await _service.GetByIdAsync(id, tenantId);
+        var result = await _service.GetByIdAsync(id, _tenantId);
         if (result.Success)
             return Ok(result);
 
@@ -45,22 +48,20 @@ public class LocalDeArmazenamentoController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateLocalDeArmazenamentoDto dto)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
 
-        var result = await _service.CreateAsync(dto, tenantId);
+        var result = await _service.CreateAsync(dto, _tenantId);
         return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateLocalDeArmazenamentoDto dto)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
 
-        var result = await _service.UpdateAsync(id, dto, tenantId);
+        var result = await _service.UpdateAsync(id, dto, _tenantId);
         if (result.Success)
             return Ok(result);
 
@@ -70,11 +71,10 @@ public class LocalDeArmazenamentoController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var tenantId = User.FindFirst("TenantId")?.Value;
-        if (string.IsNullOrEmpty(tenantId))
+        if (string.IsNullOrEmpty(_tenantId))
             return BadRequest("TenantId não encontrado");
 
-        var result = await _service.DeleteAsync(id, tenantId);
+        var result = await _service.DeleteAsync(id, _tenantId);
         if (result.Success)
             return Ok(result);
 

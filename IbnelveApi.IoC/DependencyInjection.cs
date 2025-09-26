@@ -35,6 +35,8 @@ public static class DependencyInjection
         services.AddScoped<IUtensilioService, UtensilioService>();
         services.AddScoped<ICategoriaUtensilioService, CategoriaUtensilioService>();
         services.AddScoped<ILocalDeArmazenamentoService, LocalDeArmazenamentoService>();
+        services.AddScoped<IFotoUtensilioService, FotoUtensilioService>();
+        
 
         //  ADICIONADO: Serviço para capturar contexto do usuário atual
         services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -65,6 +67,7 @@ public static class DependencyInjection
         services.AddScoped<IUtensilioRepository, UtensilioRepository>();
         services.AddScoped<ICategoriaUtensilioRepository, CategoriaUtensilioRepository>();
         services.AddScoped<ILocalDeArmazenamentoRepository, LocalDeArmazenamentoRepository>();
+        services.AddScoped<IFotoUtensilioRepository, FotoUtensilioRepository>();
 
 
         return services;

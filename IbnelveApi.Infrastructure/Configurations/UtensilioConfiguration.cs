@@ -33,5 +33,10 @@ public class UtensilioConfiguration : IEntityTypeConfiguration<Utensilio>
             .WithMany(x => x.Utensilios)
             .HasForeignKey(x => x.LocalDeArmazenamentoId)
             .IsRequired(false);
+
+        builder.HasMany(x => x.Fotos)
+            .WithOne(x => x.Utensilio)
+            .HasForeignKey(x => x.UtensilioId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
