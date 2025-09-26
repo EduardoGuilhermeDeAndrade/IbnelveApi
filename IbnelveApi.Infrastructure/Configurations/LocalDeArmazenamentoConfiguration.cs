@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace IbnelveApi.Infrastructure.Configurations;
 
-public class UtensilioConfiguration : IEntityTypeConfiguration<Utensilio>
+public class LocalDeArmazenamentoConfiguration : IEntityTypeConfiguration<LocalDeArmazenamento>
 {
-    public void Configure(EntityTypeBuilder<Utensilio> builder)
+    public void Configure(EntityTypeBuilder<LocalDeArmazenamento> builder)
     {
-        builder.ToTable("Utensilios");
+        builder.ToTable("LocaisDeArmazenamento");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Nome)
@@ -18,19 +18,17 @@ public class UtensilioConfiguration : IEntityTypeConfiguration<Utensilio>
         builder.Property(x => x.Descricao)
             .HasMaxLength(500);
 
+        builder.Property(x => x.ContatoResponsavel)
+            .HasMaxLength(200);
+
         builder.Property(x => x.TenantId)
             .IsRequired()
             .HasMaxLength(64);
 
         builder.HasQueryFilter(x => !x.IsDeleted);
 
-        builder.HasOne(x => x.Categoria)
-            .WithMany(x => x.Utensilios)
-            .HasForeignKey(x => x.CategoriaId)
-            .IsRequired(false);
-
-        builder.HasOne(x => x.LocalDeArmazenamento)
-            .WithMany(x => x.Utensilios)
+        builder.HasMany(x => x.Utensilios)
+            .WithOne(x => x.LocalDeArmazenamento)
             .HasForeignKey(x => x.LocalDeArmazenamentoId)
             .IsRequired(false);
     }

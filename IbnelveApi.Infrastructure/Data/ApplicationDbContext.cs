@@ -29,6 +29,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<CategoriaUtensilio> Categoria { get; set; }
     public DbSet<Cidade> Cidades { get; set; }
     public DbSet<Utensilio> Utensilios { get; set; }
+    public DbSet<LocalDeArmazenamento> LocaisDeArmazenamento { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -40,6 +41,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         modelBuilder.ApplyConfiguration(new UtensilioConfiguration());
         modelBuilder.ApplyConfiguration(new CategoriaTarefaConfiguration());
         modelBuilder.ApplyConfiguration(new CategoriaUtensilioConfiguration());
+        modelBuilder.ApplyConfiguration(new LocalDeArmazenamentoConfiguration());
 
         // Configurar filtros globais
         ConfigureGlobalFilters(modelBuilder);

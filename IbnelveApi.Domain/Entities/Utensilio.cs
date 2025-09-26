@@ -19,6 +19,8 @@ public class Utensilio : TenantEntity
 
     public int? CategoriaId { get; set; } // Torna a FK opcional
     public CategoriaUtensilio Categoria { get; set; } = null!; // Navegação
+    public int? LocalDeArmazenamentoId { get; set; }
+    public LocalDeArmazenamento? LocalDeArmazenamento { get; set; }
 
     public Utensilio() { }
 
@@ -83,4 +85,6 @@ public class Utensilio : TenantEntity
         CategoriaId = categoriaId;
         UpdatedAt = DateTime.UtcNow;
     }
+
+    public ICollection<Utensilio> Utensilios { get; set; } = new List<Utensilio>();
 }

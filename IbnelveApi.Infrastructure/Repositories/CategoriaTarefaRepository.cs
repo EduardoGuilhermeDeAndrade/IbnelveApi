@@ -8,7 +8,7 @@ namespace IbnelveApi.Infrastructure.Repositories;
 /// <summary>
 /// Implementação do repositório para CategoriaTarefa
 /// </summary>
-public class CategoriaTarefaRepository : Repository<CategoriaTarefa>, ICategoriaTarefaRepository
+public class CategoriaTarefaRepository : TenantRepository<CategoriaTarefa>, ICategoriaTarefaRepository
 {
     public CategoriaTarefaRepository(ApplicationDbContext context) : base(context)
     {
@@ -96,9 +96,12 @@ public class CategoriaTarefaRepository : Repository<CategoriaTarefa>, ICategoria
             .CountAsync();
     }
 
-    public Task<CategoriaTarefa?> GetByIdAsync(int id, string tenantId)
+    public async Task<CategoriaTarefa?> GetByIdAsync(int id, string tenantId)
     {
-        throw new NotImplementedException();
+        var query = _context.CategoriaTarefas
+            .Where(t => t.TenantId == tenantId && t.Id == id);
+
+        return await query.FirstOrDefaultAsync();
     }
 }
 
