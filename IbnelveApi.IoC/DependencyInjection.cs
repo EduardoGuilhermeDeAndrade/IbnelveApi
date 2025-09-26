@@ -39,7 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IFotoUtensilioService, FotoUtensilioService>();
         
 
-        //  ADICIONADO: Serviço para capturar contexto do usuário atual
+        //  ADICIONADO: Serviï¿½o para capturar contexto do usuï¿½rio atual
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // JWT Service
@@ -48,20 +48,20 @@ public static class DependencyInjection
         // ===== VALIDATION =====
         services.AddValidatorsFromAssemblyContaining<CreateMembroDtoValidator>();
 
-        //Não necessário registrar todos, pois o FluentValidation já faz isso automaticamente
+        //Nï¿½o necessï¿½rio registrar todos, pois o FluentValidation jï¿½ faz isso automaticamente
 
         // ===== REPOSITORIES =====
 
-        // Repositório genérico base
+        // Repositï¿½rio genï¿½rico base
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-        // Repositórios base por tipo de entidade
+        // Repositï¿½rios base por tipo de entidade
         services.AddScoped(typeof(IGlobalRepository<>), typeof(GlobalRepository<>));
         services.AddScoped(typeof(ITenantRepository<>), typeof(TenantRepository<>));
         services.AddScoped(typeof(IUserOwnedRepository<>), typeof(UserOwnedRepository<>));
 
-        // Repositórios específicos existentes
+        // Repositï¿½rios especï¿½ficos existentes
         services.AddScoped<IMembroRepository, MembroRepository>();
         services.AddScoped<ITarefaRepository, TarefaRepository>();
         services.AddScoped<ICategoriaTarefaRepository, CategoriaTarefaRepository>();
@@ -78,8 +78,20 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // ===== DATABASE =====
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        
+        if (connectionString!.Contains("Data Source") && connectionString.Contains(".db"))
+        {
+            // SQLite configuration
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(connectionString));
+        }
+        else
+        {
+            // SQL Server configuration
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
+        }
 
         // ===== IDENTITY =====
         services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -118,7 +130,7 @@ public static class DependencyInjection
             };
         });
 
-        //  ADICIONADO: HttpContextAccessor é necessário para o CurrentUserService
+        //  ADICIONADO: HttpContextAccessor ï¿½ necessï¿½rio para o CurrentUserService
         services.AddHttpContextAccessor();
 
         return services;
