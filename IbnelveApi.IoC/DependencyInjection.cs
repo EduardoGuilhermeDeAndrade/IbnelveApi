@@ -1,7 +1,6 @@
 using FluentValidation;
 using IbnelveApi.Application.Interfaces;
 using IbnelveApi.Application.Services;
-using IbnelveApi.Application.Validators.CategoriaTarefa;
 using IbnelveApi.Application.Validators.Membro;
 using IbnelveApi.Domain.Interfaces;
 using IbnelveApi.Infrastructure.Data;
@@ -30,8 +29,6 @@ public static class DependencyInjection
     {
         // ===== APPLICATION SERVICES =====
         services.AddScoped<IMembroService, MembroService>();
-        services.AddScoped<ITarefaService, TarefaService>();
-        services.AddScoped<ICategoriaTarefaService, CategoriaTarefaService>();
         services.AddScoped<ICidadeService, CidadeService>();
         services.AddScoped<IUtensilioService, UtensilioService>();
         services.AddScoped<ICategoriaUtensilioService, CategoriaUtensilioService>();
@@ -39,7 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IFotoUtensilioService, FotoUtensilioService>();
         
 
-        //  ADICIONADO: Serviço para capturar contexto do usuário atual
+        //  ADICIONADO: Serviï¿½o para capturar contexto do usuï¿½rio atual
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // JWT Service
@@ -48,23 +45,21 @@ public static class DependencyInjection
         // ===== VALIDATION =====
         services.AddValidatorsFromAssemblyContaining<CreateMembroDtoValidator>();
 
-        //Não necessário registrar todos, pois o FluentValidation já faz isso automaticamente
+        //Nï¿½o necessï¿½rio registrar todos, pois o FluentValidation jï¿½ faz isso automaticamente
 
         // ===== REPOSITORIES =====
 
-        // Repositório genérico base
+        // Repositï¿½rio genï¿½rico base
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-        // Repositórios base por tipo de entidade
+        // Repositï¿½rios base por tipo de entidade
         services.AddScoped(typeof(IGlobalRepository<>), typeof(GlobalRepository<>));
         services.AddScoped(typeof(ITenantRepository<>), typeof(TenantRepository<>));
         services.AddScoped(typeof(IUserOwnedRepository<>), typeof(UserOwnedRepository<>));
 
-        // Repositórios específicos existentes
+        // Repositï¿½rios especï¿½ficos existentes
         services.AddScoped<IMembroRepository, MembroRepository>();
-        services.AddScoped<ITarefaRepository, TarefaRepository>();
-        services.AddScoped<ICategoriaTarefaRepository, CategoriaTarefaRepository>();
         services.AddScoped<ICidadeRepository, CidadeRepository>();
         services.AddScoped<IUtensilioRepository, UtensilioRepository>();
         services.AddScoped<ICategoriaUtensilioRepository, CategoriaUtensilioRepository>();
@@ -118,7 +113,7 @@ public static class DependencyInjection
             };
         });
 
-        //  ADICIONADO: HttpContextAccessor é necessário para o CurrentUserService
+        //  ADICIONADO: HttpContextAccessor ï¿½ necessï¿½rio para o CurrentUserService
         services.AddHttpContextAccessor();
 
         return services;

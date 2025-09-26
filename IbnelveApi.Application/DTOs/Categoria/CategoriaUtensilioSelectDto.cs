@@ -1,4 +1,4 @@
-namespace IbnelveApi.Application.DTOs.CategoriaTarefa;
+namespace IbnelveApi.Application.DTOs.Categoria;
 
 /// <summary>
 /// DTO simplificado para uso em selects

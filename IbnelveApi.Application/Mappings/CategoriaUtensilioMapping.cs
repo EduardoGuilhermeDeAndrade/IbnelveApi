@@ -1,51 +1,36 @@
-using IbnelveApi.Application.DTOs.CategoriaTarefa;
+using IbnelveApi.Application.DTOs.Categoria;
 using IbnelveApi.Domain.Entities;
 
 namespace IbnelveApi.Application.Mappings;
 
 /// <summary>
-/// Extensões para mapeamento entre CategoriaTarefa e DTOs
+/// Extensões para mapeamento entre CategoriaUtensilio e DTOs
 /// </summary>
-public static class CategoriaTarefaMapping
+public static class CategoriaUtensilioMapping
 {
     /// <summary>
-    /// Converte CategoriaTarefa para CategoriaDto
+    /// Converte CategoriaUtensilio para CategoriaUtensilioDto
     /// </summary>
-    public static CategoriaTarefaDto ToDto(this CategoriaTarefa categoria)
+    public static CategoriaUtensilioDto ToDto(this CategoriaUtensilio categoria)
     {
-        return new CategoriaTarefaDto
+        return new CategoriaUtensilioDto
         {
             Id = categoria.Id,
             Nome = categoria.Nome,
             Descricao = categoria.Descricao,
-            Cor = categoria.Cor,
+            Cor = null, // CategoriaUtensilio doesn't have Cor property
             Ativa = categoria.Ativa,
             TenantId = categoria.TenantId,
             CreatedAt = categoria.CreatedAt,
-            UpdatedAt = categoria.UpdatedAt,
-            QuantidadeTarefas = 0 // Será preenchido pelo service
+            UpdatedAt = categoria.UpdatedAt
         };
     }
 
     /// <summary>
-    /// Converte CategoriaTarefa para CategoriaTarefaSelectDto
+    /// Converte CreateCategoriaUtensilioDto para CategoriaUtensilio
     /// </summary>
-    public static CategoriaTarefaSelectDto ToSelectDto(this CategoriaTarefa categoria)
+    public static CategoriaUtensilio ToEntity(this CreateCategoriaUtensilioDto dto, string tenantId, string userId)
     {
-        return new CategoriaTarefaSelectDto
-        {
-            Id = categoria.Id,
-            Nome = categoria.Nome,
-            Cor = categoria.Cor
-        };
-    }
-
-    /// <summary>
-    /// Converte CreateCategoriaTarefaDto para CategoriaTarefa
-    /// </summary>
-    public static CategoriaTarefa ToEntity(this CreateCategoriaTarefaDto dto, string tenantId, string userId)
-    {
-        return new CategoriaTarefa(dto.Nome, dto.Descricao, dto.Cor, tenantId, userId);
+        return new CategoriaUtensilio(dto.Nome, dto.Descricao, tenantId, userId);
     }
 }
-

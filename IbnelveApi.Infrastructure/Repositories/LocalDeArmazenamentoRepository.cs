@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace IbnelveApi.Infrastructure.Repositories;
 
 /// <summary>
-/// Implementação do repositório para LocalDeArmazenamento
+/// Implementaï¿½ï¿½o do repositï¿½rio para LocalDeArmazenamento
 /// </summary>
 public class LocalDeArmazenamentoRepository : TenantRepository<LocalDeArmazenamento>, ILocalDeArmazenamentoRepository
 {
@@ -50,7 +50,7 @@ public class LocalDeArmazenamentoRepository : TenantRepository<LocalDeArmazename
 
     public async Task<bool> ExisteNomeAsync(string nome, string tenantId, int? excludeId = null)
     {
-        var query = _context.CategoriaTarefas
+        var query = _context.LocaisDeArmazenamento
             .Where(c => c.Nome.ToLower() == nome.ToLower() &&
                        c.TenantId == tenantId &&
                        !c.IsDeleted);

@@ -24,8 +24,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     }
 
     public DbSet<Membro> Membros { get; set; }
-    public DbSet<Tarefa> Tarefas { get; set; }
-    public DbSet<CategoriaTarefa> CategoriaTarefas { get; set; }
     public DbSet<CategoriaUtensilio> Categoria { get; set; }
     public DbSet<Cidade> Cidades { get; set; }
     public DbSet<Utensilio> Utensilios { get; set; }
@@ -36,10 +34,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         // Aplicar configurações
         modelBuilder.ApplyConfiguration(new MembroConfiguration());
-        modelBuilder.ApplyConfiguration(new TarefaConfiguration());
         modelBuilder.ApplyConfiguration(new CidadeConfiguration());
         modelBuilder.ApplyConfiguration(new UtensilioConfiguration());
-        modelBuilder.ApplyConfiguration(new CategoriaTarefaConfiguration());
         modelBuilder.ApplyConfiguration(new CategoriaUtensilioConfiguration());
         modelBuilder.ApplyConfiguration(new LocalDeArmazenamentoConfiguration());
 
@@ -59,14 +55,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             !e.IsDeleted &&
             GetCurrentTenantId() != null &&
             e.TenantId == GetCurrentTenantId());
-
-        // Filtro para UserOwnedEntity (como Tarefa) - TenantId + UserId
-        modelBuilder.Entity<Tarefa>().HasQueryFilter(e =>
-            !e.IsDeleted &&
-            GetCurrentTenantId() != null &&
-            e.TenantId == GetCurrentTenantId() &&
-            GetCurrentUserId() != null &&
-            e.UserId == GetCurrentUserId());
     }
 
     private string? GetCurrentTenantId()
