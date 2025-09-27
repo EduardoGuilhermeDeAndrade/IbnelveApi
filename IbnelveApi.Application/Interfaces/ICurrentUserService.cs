@@ -1,4 +1,5 @@
 ﻿namespace IbnelveApi.Application.Interfaces;
+using IbnelveApi.Domain.Enums;
 
 /// <summary>
 /// Interface para capturar informações do usuário atual autenticado
@@ -24,5 +25,10 @@ public interface ICurrentUserService
     /// Verifica se o usuário está autenticado
     /// </summary>
     bool IsAuthenticated();
+
+    /// <summary>
+    /// Role do usuário atual
+    /// </summary>
+    Role GetUserRole();
 }
 

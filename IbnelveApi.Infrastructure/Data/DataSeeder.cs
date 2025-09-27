@@ -1,16 +1,18 @@
+using IbnelveApi.Domain.Entities;
+using IbnelveApi.Domain.Enums;
+using IbnelveApi.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using IbnelveApi.Domain.Entities;
-using IbnelveApi.Domain.ValueObjects;
-using IbnelveApi.Domain.Enums;
-using IbnelveApi.Domain.Entities;
 
 namespace IbnelveApi.Infrastructure.Data;
 
 public static class DataSeeder
 {
-    public static async Task SeedAsync(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    public static async Task SeedAsync(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
     {
+        // Seed de usuários com roles e permissões
+        await UserPermissionsSeeder.SeedUsersAndPermissionsAsync(userManager, roleManager);
+
         //Seed de usuários admin
         await SeedUsersAsync(userManager, context);
 
