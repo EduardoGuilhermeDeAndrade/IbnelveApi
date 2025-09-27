@@ -1,138 +1,145 @@
-﻿# Model Context Protocol (MCP) — IbnelveApi
+﻿# Copilot Instruction — IbnelveApi
 
-## 1. Propósito
-Fornecer contexto conciso ao Copilot para gerar código alinhado com as convenções e a arquitetura do projeto **IbnelveApi** (API RESTful, .NET 9, Clean Architecture, multi-tenant).
-
----
-
-## 2. Linguagem e runtime
-- **Linguagem:** C# (C# 12)
-- **Runtime:** .NET 9 / ASP.NET Core
-- Sugestões devem usar sintaxe moderna compatível com essas versões.
+Este documento fornece **contexto e diretrizes obrigatórias** para que o GitHub Copilot gere código alinhado à arquitetura, convenções e práticas do projeto **IbnelveApi** (API RESTful, .NET 9, Clean Architecture, multi-tenant).
 
 ---
 
-## 3. Arquitetura e organização de pastas
-- **Padrão:** Clean Architecture (separar responsabilidades por camadas).
-- Estrutura esperada:
-  - `IbnelveApi.Api/` — apresentação (controllers, middlewares)
-  - `IbnelveApi.Application/` — DTOs, interfaces, services, validators, mappings
-  - `IbnelveApi.Domain/` — entidades, enums, value objects, interfaces de domínio
-  - `IbnelveApi.Infrastructure/` — DbContext, configurações EF, repositórios
-  - `IbnelveApi.IoC/` — injeção de dependência
-  - `IbnelveApi.Tests/` — testes unitários e integração
+## 1. Linguagem e Runtime
 
-Ao sugerir código, manter dependências unidirecionais (Apresentação → Aplicação → Infraestrutura → Domínio). Não colocar lógica de negócio na camada Api.
+* **Linguagem:** C# (C# 12/13)
+* **Runtime:** .NET 9 / ASP.NET Core
+* Gerar código sempre compatível com estas versões.
 
 ---
 
-## 4. Nomenclatura e estilo de código (curto)
-- **Classes/DTOs/Enums/Interfaces:** PascalCase (`Membro`, `CreateMembroDto`, `IMembroService`).
-- **Métodos assíncronos:** sufixo `Async` (`GetAllAsync`).
-- **Variáveis locais:** camelCase.
-- **Nomes de validators:** `CreateXDtoValidator` / `UpdateXDtoValidator`.
-- **Comentários:** preferir código autoexplicativo; XML comments apenas em APIs públicas e controladores.
+## 2. Arquitetura e Organização de Pastas
+
+* **Padrão:** Clean Architecture
+* **Camadas:**
+
+  * `IbnelveApi.Api` — Controllers, Middlewares, Program.cs
+  * `IbnelveApi.Application` — DTOs, Services, Interfaces, Validators, Mappings, Responses
+  * `IbnelveApi.Domain` — Entidades, Enums, Value Objects, Interfaces de domínio
+  * `IbnelveApi.Infrastructure` — EF Core (DbContext, Repositórios, Configurações)
+  * `IbnelveApi.IoC` — Injeção de dependência, Configuração de JWT
+
+**Regra:** Fluxo unidirecional (Api → Application → Infrastructure → Domain).
+**Proibido:** lógica de negócio em Api.
 
 ---
 
-## 5. Padrões e práticas obrigatórios
-- **SOLID** sempre.
-- **Repository Pattern** para acesso a dados (interfaces no domínio, implementações na infrastructure).
-- **Service Layer** (Application) para orquestração e regras de aplicação.
-- **DTOs** para entrada/saída; não expor entidades do domínio diretamente.
-- **Soft delete**: usar `IsDeleted` + `HasQueryFilter` no EF Core.
-- **Multitenancy**: entidades user-owned ou tenant-owned devem conter `TenantId` e, quando aplicável, `UserId`.
+## 3. Padrões de Código e Nomenclatura
+
+* **Classes/DTOs/Enums/Interfaces:** PascalCase
+* **Variáveis locais:** camelCase
+* **Métodos assíncronos:** sufixo `Async`
+* **Validators:** `CreateXDtoValidator`, `UpdateXDtoValidator`
+* **Comentários:** preferir código autoexplicativo; XML apenas em APIs públicas
 
 ---
 
-## 6. Principais bibliotecas (priorizar nas sugestões)
-- **Entity Framework Core** (configurar via Fluent API)
-- **FluentValidation** (validadores separados)
-- **Swashbuckle / OpenAPI** (documentação)
-- **ASP.NET Identity** (quando necessário)
-- **xUnit + Moq** (testes unitários)
+## 4. Entidades e Herança
 
-Observação: evitar Data Annotations para configuração do EF; sempre preferir Fluent API.
+* `GlobalEntity` — Id (Guid), IsDeleted, CreatedAt, UpdatedAt
+* `TenantEntity : GlobalEntity` — adiciona `TenantId`
+* `UserOwnedEntity : TenantEntity` — adiciona `UserId`
 
----
+**Regras:**
 
-## 7. Entidades e herança padrão
-- **GlobalEntity** — Id, IsDeleted, CreatedAt, UpdatedAt, excluir logicamente via `ExcluirLogicamente()`.
-- **TenantEntity : GlobalEntity** — `TenantId` (string).
-- **UserOwnedEntity : TenantEntity** — `UserId` (string).
-
-Ao criar novas entidades, seguir essa hierarquia quando aplicável.
+* Soft delete com `IsDeleted` + `HasQueryFilter`
+* Sempre filtrar por `TenantId` (e `UserId` quando aplicável)
 
 ---
 
-## 8. DTOs, Mappings e Validators
-- **DTOs:** `CreateXDto`, `UpdateXDto`, `XDto` (read).
-- **Mappings:** métodos manuais estáticos em `Application.Mappings` ou AutoMapper configurado em Application.
-- **Validators:** regras em classes `AbstractValidator<T>`; sempre validar DTOs antes de persitir.
+## 5. Multi-tenancy
+
+* Todas as entidades relevantes devem conter `TenantId`.
+* Serviços e repositórios aplicam filtro global de tenant.
+* Admins podem sobrescrever o `TenantId` em casos específicos.
+* Usuários e dados de seed separados por tenant.
 
 ---
 
-## 9. Repositórios e consultas
-- Interfaces de repositório no domínio (ex.: `IUserOwnedRepository<T>`).
-- Implementações na Infrastructure usando `DbContext` e `DbSet<T>`.
-- Métodos esperados: `GetAllAsync`, `GetByIdAsync`, `CreateAsync`, `UpdateAsync`, `DeleteAsync` (soft delete).
-- Aplicar filtros por `TenantId`/`UserId` e respeitar `includeDeleted` quando for parâmetro.
+## 6. DTOs, Mappings e Validators
+
+* **DTOs:** `CreateXDto`, `UpdateXDto`, `XDto` (read)
+* **Mappings:** AutoMapper configurado na Application
+* **Validators:** sempre baseados em FluentValidation, não em DataAnnotations
 
 ---
 
-## 10. Configuração EF Core (regras rápidas)
-- Usar `IEntityTypeConfiguration<T>` para configurar tabelas.
-- Definir `HasQueryFilter(m => !m.IsDeleted)` para soft delete.
-- Criar índices compostos quando necessário (ex.: TenantId + UserId + CPF) com `HasFilter("[IsDeleted] = 0")` para SQL Server.
-- Value Objects devem ser `OwnsOne`.
+## 7. Repositórios e Infraestrutura
+
+* **Interfaces**: no domínio
+* **Implementações**: na infraestrutura
+* Métodos obrigatórios:
+
+  * `GetAllAsync`
+  * `GetByIdAsync`
+  * `CreateAsync`
+  * `UpdateAsync`
+  * `DeleteAsync` (soft delete)
+
+**Observação:** sempre aplicar filtro por tenant e soft delete.
 
 ---
 
-## 11. Controllers / Api
-- Controllers devem ser finos: validar modelo (ModelState), recuperar `tenantId`/`userId` via `ICurrentUserService`, delegar para Application services e retornar `ApiResponse<T>`.
-- Atributos: `[ApiController]`, `[Route("api/[controller]")]`, `[Authorize]` quando necessário.
+## 8. Controllers / API
+
+* **Responsabilidades:**
+
+  * Validar modelo (ModelState + Validator)
+  * Recuperar `TenantId` / `UserId` via `ICurrentUserService`
+  * Delegar para serviços da Application
+  * Retornar `ApiResponse<T>`
+
+* **Atributos:**
+
+  * `[ApiController]`, `[Route("api/[controller]")]`
+  * `[Authorize]` onde necessário
 
 ---
 
-## 12. Testes
-- **Unit tests:** xUnit + Moq; cobrir Services, Validators e Mappings.
-- **Integration tests:** usar banco em memória ou dockerized SQL Server quando necessário.
-- Nome de teste: `MethodName_Scenario_ExpectedResult`.
+## 9. Segurança
+
+* Autenticação via JWT Bearer (config em `appsettings.json`)
+* **Nunca** expor secrets no repositório (usar env vars)
+* Configurações sensíveis em `IConfiguration`
 
 ---
 
-## 13. Segurança e segredos
-- **NÃO** commit API keys, secrets ou connection strings. Preferir `IConfiguration` + environment variables.
-- JWT configurado via `JwtSettings` no `appsettings.json` e lido pelo `JwtBearer`.
+## 10. Convenções de Projeto
+
+* Responses padronizadas via `ApiResponse<T>`
+* Nunca expor entidades diretamente em endpoints
+* Mapeamentos manuais ou AutoMapper centralizado
+* Soft delete aplicado em todas as entidades
+* Testabilidade e separação de responsabilidades são prioridade
+* **Domínio não deve ser poluído com pacotes externos**
+
+  * Apenas C# puro e construções da linguagem
+  * Nada de EF Core, FluentValidation, bibliotecas de terceiros
 
 ---
 
-## 14. Git / PRs (curto)
-- Mensagens no padrão `feat|fix|chore(scope): descrição` (Conventional Commits).
-- Cada PR deve conter objetivo, mudanças principais e instruções de teste.
+## 11. Exemplos de Prompts para Copilot
+
+* `// Criar entidade Projeto herdando de UserOwnedEntity com propriedades Nome (string, obrigatório, máx 200) e Descricao (string, opcional, máx 500).`
+* `// Criar CreateProjetoDto, UpdateProjetoDto e ProjetoDto + validadores correspondentes.`
+* `// Implementar ProjetoService com validação de duplicidade, persistência e retorno em ApiResponse.`
+* `// Configurar IEntityTypeConfiguration para Projeto com índices em TenantId + Nome.`
 
 ---
 
-## 15. Exemplos rápidos de prompts para Copilot
-- `// Criar entidade Projeto seguindo o padrão UserOwnedEntity ...` (especifique propriedades)
-- `// Criar CreateProjetoDto e seu validator seguindo padrões.`
-- `// Implementar ProjetoService com validação -> duplicidade -> criação -> retorno ApiResponse`
+## 12. Prioridades do Copilot
+
+1. Seguir arquitetura e convenções deste documento
+2. Priorizar **Fluent API** em vez de Data Annotations
+3. Usar **FluentValidation** em DTOs
+4. Respeitar multi-tenancy em consultas e comandos
+5. Retornar sempre `ApiResponse<T>` em APIs
+6. **Manter domínio 100% limpo, sem dependência de pacotes externos**
 
 ---
 
-## 16. Como o Copilot deve priorizar
-1. Seguir a arquitetura e convenções descritas acima.  
-2. Priorizar Fluent API sobre Data Annotations para EF.  
-3. Sugerir validações via FluentValidation.  
-4. Evitar exposição de entidades nos endpoints (usar DTOs).  
-
----
-
-## 17. Observações finais
-- Mantenha este documento sucinto; atualize quando houver mudanças de arquitetura ou versões.
-- Para casos ambíguos, priorizar segurança, testabilidade e separação de responsabilidades.
-
----
-
-*Fim do MCP — IbnelveApi*
-
+*Fim do Copilot Instruction — IbnelveApi*

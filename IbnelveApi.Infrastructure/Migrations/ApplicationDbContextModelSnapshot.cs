@@ -60,7 +60,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
                     b.HasIndex("UtensilioId");
 
-                    b.ToTable("FotoUtensilio");
+                    b.ToTable("FotoUtensilio", (string)null);
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.CategoriaTarefa", b =>
@@ -203,7 +203,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
                     b.HasIndex("EstadoId");
 
-                    b.ToTable("Cidades");
+                    b.ToTable("Cidades", (string)null);
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Estado", b =>
@@ -241,7 +241,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
                     b.HasIndex("PaisId");
 
-                    b.ToTable("Estado");
+                    b.ToTable("Estado", (string)null);
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.LocalDeArmazenamento", b =>
@@ -376,7 +376,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pais");
+                    b.ToTable("Pais", (string)null);
                 });
 
             modelBuilder.Entity("IbnelveApi.Domain.Entities.Tarefa", b =>
@@ -801,7 +801,7 @@ namespace IbnelveApi.Infrastructure.Migrations
 
                             b1.HasKey("MembroId");
 
-                            b1.ToTable("Membros");
+                            b1.ToTable("Membros", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("MembroId");

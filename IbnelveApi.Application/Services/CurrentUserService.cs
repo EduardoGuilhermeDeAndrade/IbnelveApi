@@ -1,4 +1,5 @@
 ﻿using IbnelveApi.Application.Interfaces;
+using IbnelveApi.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
@@ -38,6 +39,13 @@ public class CurrentUserService : ICurrentUserService
     public bool IsAuthenticated()
     {
         return _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+    }
+
+    public Role GetUserRole()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        var roleStr = user?.FindFirst(ClaimTypes.Role)?.Value ?? "User";
+        return Enum.TryParse<Role>(roleStr, out var role) ? role : Role.User;
     }
 }
 

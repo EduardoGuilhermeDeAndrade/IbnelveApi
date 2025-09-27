@@ -118,12 +118,13 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
     // Ensure database is created
     await context.Database.EnsureCreatedAsync();
 
     // Seed data
-    await DataSeeder.SeedAsync(context, userManager);
+    await DataSeeder.SeedAsync(context, userManager, roleManager);
 }
 
 app.Run("http://0.0.0.0:5000");
