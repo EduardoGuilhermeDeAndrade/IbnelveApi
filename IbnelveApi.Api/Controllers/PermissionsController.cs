@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using IbnelveApi.Application.Dto;
 using IbnelveApi.Domain.Enums;
 using IbnelveApi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using IbnelveApi.Application.DTOs.AcessosPemissoes;
 
 namespace IbnelveApi.Api.Controllers
 {

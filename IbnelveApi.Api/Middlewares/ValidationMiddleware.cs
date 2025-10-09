@@ -4,17 +4,19 @@ using FluentValidation.Results;
 using IbnelveApi.Application.Common;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
+using Microsoft.Extensions.Hosting; // Adicionado para IHostEnvironment
 
 namespace IbnelveApi.Api.middlewares
 {
-
     public class ValidationMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly IHostEnvironment _env; // Adicionado
 
-        public ValidationMiddleware(RequestDelegate next)
+        public ValidationMiddleware(RequestDelegate next, IHostEnvironment env) // Modificado
         {
             _next = next;
+            _env = env;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -41,9 +43,13 @@ namespace IbnelveApi.Api.middlewares
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
 
+                var errors = _env.IsDevelopment()
+                    ? new List<string> { ex.Message, ex.StackTrace ?? "" }
+                    : new List<string>();
+
                 var response = ApiResponse<object>.ErrorResult(
                     "Erro interno do servidor",
-                    new List<string> { ex.Message }
+                    errors
                 );
 
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
