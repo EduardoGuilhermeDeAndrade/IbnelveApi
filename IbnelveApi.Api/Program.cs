@@ -34,20 +34,20 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Services.AddCors(options =>
 {
 
-    //options.AddPolicy("AllowFrontend", policy =>
-    //{
-    //    policy.WithOrigins("https://localhost:7067")
-    //          .AllowAnyMethod()
-    //          .AllowAnyHeader();
-    //});
-
-
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("https://localhost:4200")
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
+
+
+    //options.AddPolicy("AllowAll", policy =>
+    //{
+    //    policy.AllowAnyOrigin()
+    //          .AllowAnyMethod()
+    //          .AllowAnyHeader();
+    //});
 });
 
 // Add Swagger/OpenAPI
@@ -102,7 +102,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 // Adicione o middleware ANTES do `app.UseAuthorization()`
 app.UseMiddleware<ValidationMiddleware>();

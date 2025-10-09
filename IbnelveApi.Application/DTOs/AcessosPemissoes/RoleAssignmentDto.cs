@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using IbnelveApi.Domain.Enums;
 
-namespace IbnelveApi.Application.Dto
+namespace IbnelveApi.Application.DTOs.AcessosPemissoes
 {
     /// <summary>
     /// DTO para atribuição de papéis e permissões a usuários via API.

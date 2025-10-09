@@ -1,4 +1,4 @@
-namespace IbnelveApi.Application.Dto
+namespace IbnelveApi.Application.DTOs.AcessosPemissoes
 {
     /// <summary>
     /// DTO mínimo para criação de Pessoa.
