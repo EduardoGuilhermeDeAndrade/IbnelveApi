@@ -4,6 +4,8 @@ using System.Security.Claims;
 using IbnelveApi.Api.Models;
 using IbnelveApi.Application.Common;
 using IbnelveApi.IoC;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IbnelveApi.Api.Controllers;
 
@@ -41,21 +43,51 @@ public class AuthController : ControllerBase
             if (!result.Succeeded)
                 return BadRequest(ApiResponse<LoginResponse>.ErrorResult("Credenciais inválidas"));
 
-            // Get TenantId from user claims
-            var claims = await _userManager.GetClaimsAsync(user);
-            var tenantIdClaim = claims.FirstOrDefault(c => c.Type == "TenantId");
-            
-            if (tenantIdClaim == null)
-                return BadRequest(ApiResponse<LoginResponse>.ErrorResult("Usuário não possui TenantId configurado"));
+            var userClaims = await _userManager.GetClaimsAsync(user);
 
-            var token = _jwtTokenService.GenerateToken(user.Id, user.Email!, tenantIdClaim.Value);
+            // Obtenha valores específicos das claims
+            var roleClaim = userClaims.FirstOrDefault(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value ?? "User";
+            var tenantIdClaim = userClaims.FirstOrDefault(c => c.Type == "TenantId")?.Value ?? "algum-guid-aqui";
+            var emailClaim = userClaims.FirstOrDefault(c => c.Type == "email")?.Value ?? user.Email;
+            var permissionClaims = userClaims.Where(c => c.Type == "permission").Select(c => c.Value).ToList();
+
+            // Claims obrigatórias do JWT
+            var claims = new List<Claim>
+            {
+                new Claim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", roleClaim),
+                new Claim("TenantId", tenantIdClaim),
+                new Claim("email", emailClaim),
+                new Claim(JwtRegisteredClaimNames.Iss, _configuration["JwtSettings:Issuer"]),
+                new Claim(JwtRegisteredClaimNames.Aud, _configuration["JwtSettings:Audience"])
+            };
+
+            // Adiciona permissões como claims múltiplas
+            foreach (var permission in permissionClaims)
+            {
+                claims.Add(new Claim("permission", permission));
+            }
+
+            // ...código para gerar o token JWT, incluindo exp (expiration) na configuração do token...
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(1), // exp
+                Issuer = _configuration["JwtSettings:Issuer"],
+                Audience = _configuration["JwtSettings:Audience"],
+                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
             var expirationHours = int.Parse(_configuration["JwtSettings:ExpirationHours"]!);
 
             var response = new LoginResponse
             {
-                Token = token,
+                Token = tokenHandler.WriteToken(token),
                 Email = user.Email!,
-                TenantId = tenantIdClaim.Value,
+                TenantId = tenantIdClaim,
                 ExpiresAt = DateTime.UtcNow.AddHours(expirationHours)
             };
 
